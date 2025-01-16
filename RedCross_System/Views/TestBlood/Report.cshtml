@@ -1,0 +1,84 @@
+﻿@model List<RedCross_System.ViewModel.TestBlood.TestBloodReportViewModel>
+
+@{
+  ViewData["Title"] = "Test Blood Report";
+}
+
+<div class="content-wrapper">
+  <div class="content-header">
+    <div class="container">
+      <div class="row mb-2">
+        <div class="col-sm-12">
+          <h1 class="m-0">Test Blood Report</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+    <div class="container">
+      <div class="row justify-content-start">
+        <div class="col-md-9">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">Blood Donation Information</h3>
+            </div>
+            <div class="card-body">
+              @foreach (var item in Model)
+              {
+                <div class="table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <tbody>
+                      <tr>
+                        <th class="bg-light w-25">Test Name</th>
+                        <td>@item.TestName</td>
+                      </tr>
+                      <tr>
+                        <th class="bg-light">Donor Name</th>
+                        <td>@item.DonorName</td>
+                      </tr>
+                      <tr>
+                        <th class="bg-light">Donation Date</th>
+                        <td>@item.DonationDate.ToString("yyyy-MM-dd")</td>
+                      </tr>
+                      <tr>
+                        <th class="bg-light">Quantity</th>
+                        <td>@item.Quantity</td>
+                      </tr>
+                      <tr>
+                        <th class="bg-light">Blood Type</th>
+                        <td>@item.BloodType</td>
+                      </tr>
+                      <tr>
+                        <th class="bg-light">Status</th>
+                        <td>
+                          <span class="badge @(item.Status == "Approved" ? "bg-success" : "bg-warning")">
+                            @item.Status
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              }
+              <div class="row mt-4">
+                <div class="col-12">
+                  <div class="float-end">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                      <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <form asp-action="ExportReport" method="post" class="d-inline ms-2">
+                      <button type="submit" class="btn btn-success">
+                        <i class="fas fa-file-pdf"></i> Export as PDF
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,98 @@
+﻿@model RedCross_System.ViewModels.DonorProfileViewModel
+
+<div class="container mt-4">
+  <h1 class="text-center text-primary mb-4">Donor Profile</h1>
+
+  <div class="card shadow-sm mb-3 mx-auto" style="max-width: 800px;">
+    <div class="card-header bg-primary text-white">
+      <h5 class="card-title mb-0">Donor Information</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-8">
+          <p class="mb-1"><strong>Name:</strong> @Model.Donor.Name</p>
+          <p class="mb-1"><strong>Email:</strong> @Model.Donor.Email</p>
+          <p class="mb-1"><strong>Mobile Number:</strong> @Model.Donor.MobileNumber</p>
+          <p class="mb-1"><strong>Temporary Address:</strong> @Model.Donor.TemporaryAddress</p>
+          <p class="mb-1"><strong>Permanent Address:</strong> @Model.Donor.PermanentAddress</p>
+          <p class="mb-1"><strong>Blood Type:</strong> @Model.Donor.BloodType?.Name</p>
+        </div>
+        <div class="col-md-4 text-center">
+          @if (Model.Donor.Photo != null)
+          {
+            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Donor.Photo)"
+                 alt="Donor Photo"
+                 class="img-fluid rounded-circle shadow-sm"
+                 style="max-width: 120px;" />
+          }
+          else
+          {
+            <div class="text-muted" style="font-size: 0.9rem;">No Photo Available</div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mx-auto mb-4" style="max-width: 800px;">
+    <div class="card-header bg-success text-white">
+      <h5 class="card-title mb-0">Donation History</h5>
+    </div>
+    <div class="card-body">
+      @if (Model.Donations != null && Model.Donations.Any())
+      {
+        <div class="row g-3">
+          @foreach (var donation in Model.Donations)
+          {
+            <div class="col-md-6 col-lg-4">
+              <div class="card border-success h-100 shadow-sm">
+                <div class="card-body">
+                  <h6 class="card-title mb-1">
+                    <i class="fas fa-tint text-danger"></i> Bag: @donation.BagNumber
+                  </h6>
+                  <span class="badge bg-success">
+                    @(donation.Campaign?.Name ?? "Direct Donation")
+                  </span>
+                  <div class="mt-2">
+                    <small class="text-muted">Donation Date:</small>
+                    <p class="mb-1" style="font-size: 0.9rem;">
+                      <i class="far fa-calendar-alt"></i> @donation.DonationDate.ToString("dd/MM/yyyy")
+                    </p>
+                    <small class="text-muted">Expiry Date:</small>
+                    <p class="mb-1" style="font-size: 0.9rem;">
+                      <i class="fas fa-hourglass-end"></i> @donation.ExpiryDate.ToString("dd/MM/yyyy")
+                    </p>
+                    @if (DateTime.Now > donation.ExpiryDate)
+                    {
+                      <div class="alert alert-warning py-1 px-2 mt-2 mb-0" style="font-size: 0.8rem;">
+                        <i class="fas fa-exclamation-triangle"></i> Expired
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+      else
+      {
+        <div class="alert alert-info text-center">
+          <i class="fas fa-info-circle"></i> No donation history available.
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-start mt-3 mx-auto" style="max-width: 800px;">
+    <a href="@Url.Action("Index")" class="btn btn-secondary me-2">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+    <form asp-action="ExportToExcel" method="post" class="d-inline">
+      <input type="hidden" name="id" value="@Model.Donor.Id" />
+      <button type="submit" class="btn btn-success">
+        <i class="fas fa-file-excel"></i> Export as Excel
+      </button>
+    </form>
+  </div>
+</div>

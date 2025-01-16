@@ -1,0 +1,82 @@
+﻿@model RedCross_System.ViewModels.DonationProfileViewModel
+
+<div class="container mt-4">
+  <h1 class="text-center text-primary mb-4">Donor Donation Profile</h1>
+
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card d-flex" style="height: 100%;">
+        <div class="card-header bg-primary text-white">
+          <h3 class="card-title mb-0">Donor Information</h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-12">
+              <p>
+                <i class="fas fa-user me-2" style="font-size: 24px;"></i><strong>Name:</strong>
+                @Model.Donor.Name
+              </p>
+              <div class="row mt-3">
+                <div class="col-md-6">
+                  <p>
+                    <i class="fas fa-envelope me-2" style="font-size: 20px;"></i><strong>Email:</strong>
+                    @Model.Donor.Email
+                  </p>
+                  <p>
+                    <i class="fas fa-phone-alt me-2" style="font-size: 20px;"></i><strong>Mobile:</strong>
+                    @Model.Donor.MobileNumber
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      
+      @if (Model.Donations!=null && Model.Donations.Any())
+      {
+        @foreach (var donation in Model.Donations)
+        {
+          <div class="card mb-3">
+            <div class="card-header bg-secondary text-white">
+              <h5 class="mb-0">Donation Details</h5>
+            </div>
+            <div class="card-body">
+              <p>
+                <i class="fas fa-campground me-2"></i><strong>Campaign:</strong>
+                @(donation.Campaign != null ? donation.Campaign.Name : "No Campaign")
+              </p>
+              <p>
+                <i class="fas fa-map-marker-alt me-2"></i><strong>Branch:</strong>
+                @donation.Branch.BranchName
+              </p>
+              <p>
+                <i class="fas fa-calendar-day me-2"></i><strong>Donation Date:</strong>
+                @donation.DonationDate.ToShortDateString()
+              </p>
+              <p>
+                <i class="fas fa-calendar-times me-2"></i><strong>Expiry Date:</strong>
+                @donation.ExpiryDate.ToShortDateString() 
+              </p>
+              <p>
+                <i class="fas fa-tag me-2"></i><strong>Bag Number:</strong>
+                @donation.BagNumber
+              </p>
+              <p>
+                <i class="fas fa-tint me-2"></i><strong>Blood Quantity:</strong>
+                @donation.Quantity (ml)
+              </p>
+            </div>
+          </div>
+        }
+      }
+      else
+      {
+        <p class="text-muted">No donations available for this donor.</p>
+      }
+    </div>
+  </div>
+</div>
