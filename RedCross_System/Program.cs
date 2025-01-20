@@ -46,6 +46,7 @@ builder.Services.AddSession(options =>
 
 // Add the EmailSender service
 builder.Services.AddSingleton<IEmailSender, EmailSender>();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -65,9 +66,25 @@ app.UseRouting();  // Set up routing middleware
 app.UseAuthentication();  // Enable authentication middleware
 app.UseAuthorization();  // Enable authorization middleware
 
+app.UseCors(builder => builder
+		.AllowAnyOrigin()  // Allows requests from any domain
+		.AllowAnyMethod()  // Allows all HTTP methods (GET, POST, PUT, DELETE, etc.)
+		.AllowAnyHeader()  // Allows all request headers
+);
+
+if (app.Environment.IsDevelopment())
+{
+	app.UseSwagger();  // Generate Swagger documentation
+	app.UseSwaggerUI(c =>  // Serve the Swagger UI
+	{
+		c.SwaggerEndpoint("/swagger/v1/swagger.json", "RedCross API V1");
+		c.RoutePrefix = "swagger";  // Optional: Makes Swagger UI the default page
+	});
+}
+
 // Set up the default route
 app.MapControllerRoute(
 		name: "default",
 		pattern: "{controller=Login}/{action=Index}/{id?}");  // Default route is Login/Index
 
-app.Run();  // Run the application
+	app.Run();  // Run the application

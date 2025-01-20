@@ -14,10 +14,6 @@ namespace RedCross_System.Controllers
         {
             _logger = logger;
 		}
-
-		
-		
-
 		public IActionResult Index()
 		{
 			var controllers = new List<ControllerInfo>

@@ -9,7 +9,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace RedCross_System.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Initialmigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

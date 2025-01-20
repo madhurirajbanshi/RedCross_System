@@ -12,12 +12,7 @@ namespace RedCross_System.ViewModel.TestBlood
 		public List<SelectListItem>? Donations { get; set; }
 		public string Donation { get; set; }
 		public string TestName{ get; set; }
-		public string? BagNumber { get; set; }
 		
-
-
-
-
 
 	}
 }

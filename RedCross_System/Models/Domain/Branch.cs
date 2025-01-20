@@ -19,5 +19,6 @@ public class Branch
 	public string Status { get; set; } = "Active";
 
 	public Province Province { get; set; }
+
 	public Country Country { get; set; }
 }

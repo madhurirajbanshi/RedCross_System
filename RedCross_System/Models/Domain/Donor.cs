@@ -15,7 +15,5 @@
 		public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 		public string Status { get; set; } = "active";
 		public BloodType BloodType { get; set; }
-
-
 	}
 }

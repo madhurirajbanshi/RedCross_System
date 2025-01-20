@@ -13,34 +13,34 @@ using RedCross_System.Data;
 
 namespace RedCross_System.Controllers;
 
-	[Authorize]
-	public class DonorController : Controller
+[Authorize]
+public class DonorController : Controller
+{
+	private readonly ApplicationDbContext _context;
+	private readonly SessionHelper _sessionHelper;
+
+	public DonorController(ApplicationDbContext context, SessionHelper sessionHelper)
 	{
-		private readonly ApplicationDbContext _context;
-		private readonly SessionHelper _sessionHelper;
+		_context = context;
+		_sessionHelper = sessionHelper;
+	}
 
-		public DonorController(ApplicationDbContext context, SessionHelper sessionHelper)
+	[HttpGet]
+	public async Task<IActionResult> Add()
+	{
+		var bloodTypeList = await _context.BloodTypes.Select(x => new SelectListItem
 		{
-			_context = context;
-			_sessionHelper = sessionHelper;
-		}
+			Value = x.Id.ToString(),
+			Text = x.Name
+		}).ToListAsync();
 
-		[HttpGet]
-		public async Task<IActionResult> Add()
+		var vm = new DonorAddViewModel
 		{
-			var bloodTypeList = await _context.BloodTypes.Select(x => new SelectListItem
-			{
-				Value = x.Id.ToString(),
-				Text = x.Name
-			}).ToListAsync();
+			BloodTypes = bloodTypeList
+		};
 
-			var vm = new DonorAddViewModel
-			{
-				BloodTypes = bloodTypeList
-			};
-
-			return View(vm);
-		}
+		return View(vm);
+	}
 
 	[HttpPost]
 	public async Task<IActionResult> ToggleStatus(int id)
@@ -57,129 +57,126 @@ namespace RedCross_System.Controllers;
 	}
 
 	[HttpPost]
-		public async Task<IActionResult> Add(DonorAddViewModel donorAddView)
+	public async Task<IActionResult> Add(DonorAddViewModel donorAddView)
+	{
+		var createdBy = await _sessionHelper.CurrentUser();
+		if (createdBy is null)
 		{
-			var createdBy = await _sessionHelper.CurrentUser();
-			if (createdBy is null)
+			ModelState.AddModelError("", "User not logged in.");
+			donorAddView.BloodTypes = await _context.BloodTypes.Select(x => new SelectListItem
 			{
-				ModelState.AddModelError("", "User not logged in.");
-				donorAddView.BloodTypes = await _context.BloodTypes.Select(x => new SelectListItem
-				{
-					Value = x.Id.ToString(),
-					Text = x.Name
-				}).ToListAsync();
-				return View(donorAddView);
-			}
-
-			if (!ModelState.IsValid)
-			{
-				donorAddView.BloodTypes = await _context.BloodTypes.Select(x => new SelectListItem
-				{
-					Value = x.Id.ToString(),
-					Text = x.Name
-				}).ToListAsync();
-
-				return View(donorAddView);
-			}
-
-            BloodType? bloodType = await _context.BloodTypes.FindAsync(int.Parse(donorAddView.BloodType));
-			if (bloodType == null)
-			{
-				ModelState.AddModelError("", "Invalid Blood Type selected.");
-				return View(donorAddView);
-			}
-
-			byte[] photoBytes = null;
-			if (donorAddView.Photo != null && donorAddView.Photo.Length > 0)
-			{
-            using var memoryStream = new MemoryStream();
-            await donorAddView.Photo.CopyToAsync(memoryStream);
-            photoBytes = memoryStream.ToArray();
-        }
-
-			var donor = new Donor
-			{
-				Name = donorAddView.Name,
-				TemporaryAddress = donorAddView.TemporaryAddress,
-				PermanentAddress = donorAddView.PermanentAddress,
-				MobileNumber = donorAddView.MobileNumber,
-				SecondaryNumber = donorAddView.SecondaryNumber,
-				Email = donorAddView.Email,
-				Photo = photoBytes,
-				CreatedBy = createdBy,
-				Status = donorAddView.Status,
-				BloodType = bloodType
-			};
-
-			_context.Add(donor);
-			await _context.SaveChangesAsync();
-
-			return RedirectToAction("Index");
+				Value = x.Id.ToString(),
+				Text = x.Name
+			}).ToListAsync();
+			return View(donorAddView);
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> Index()
+		if (!ModelState.IsValid)
 		{
-			var donors = await _context.Donors
-				.Include(x => x.BloodType)
-				.Select(x => new DonorIndexViewModel
-				{
-					Id = x.Id,
-					Name = x.Name,
-					TemporaryAddress = x.TemporaryAddress,
-					PermanentAddress = x.PermanentAddress,
-					MobileNumber = x.MobileNumber,
-					SecondaryNumber = x.SecondaryNumber,
-					Email = x.Email,
-					Status = x.Status,
-					PhotoBase64 = x.Photo != null ? Convert.ToBase64String(x.Photo) : null,
-					BloodType = x.BloodType.Name,
-					CreatedBy = x.CreatedBy.Name
-				}).ToListAsync();
-
-			return View(donors);
-		}
-
-		[HttpGet]
-		public async Task<IActionResult> Update(int id)
-		{
-			var donor = await _context.Donors
-				.Include(x => x.BloodType)
-				.FirstOrDefaultAsync(x => x.Id == id);
-
-			if (donor == null)
-			{
-				return NotFound();
-			}
-
-			var bloodTypeList = await _context.BloodTypes.Select(x => new SelectListItem
+			donorAddView.BloodTypes = await _context.BloodTypes.Select(x => new SelectListItem
 			{
 				Value = x.Id.ToString(),
 				Text = x.Name
 			}).ToListAsync();
 
-			var vm = new DonorUpdateViewModel
-			{
-				Id = donor.Id,
-				Name = donor.Name,
-				TemporaryAddress = donor.TemporaryAddress,
-				PermanentAddress = donor.PermanentAddress,
-				MobileNumber = donor.MobileNumber,
-				SecondaryNumber = donor.SecondaryNumber,
-				Email = donor.Email,
-				Status = donor.Status,
-				PhotoBase64 = donor.Photo != null ? Convert.ToBase64String(donor.Photo) : null,
-				BloodType = donor.BloodType.Id.ToString(),
-				BloodTypes = bloodTypeList
-			};
-
-			return View(vm);
+			return View(donorAddView);
 		}
+
+		BloodType? bloodType = await _context.BloodTypes.FindAsync(int.Parse(donorAddView.BloodType));
+		if (bloodType == null)
+		{
+			ModelState.AddModelError("", "Invalid Blood Type selected.");
+			return View(donorAddView);
+		}
+
+		byte[] photoBytes = null;
+		if (donorAddView.Photo != null && donorAddView.Photo.Length > 0)
+		{
+			photoBytes = await ConvertIFormFileToByteArray(donorAddView.Photo);
+		}
+
+		var donor = new Donor
+		{
+			Name = donorAddView.Name,
+			TemporaryAddress = donorAddView.TemporaryAddress,
+			PermanentAddress = donorAddView.PermanentAddress,
+			MobileNumber = donorAddView.MobileNumber,
+			SecondaryNumber = donorAddView.SecondaryNumber,
+			Email = donorAddView.Email,
+			Photo = photoBytes,
+			CreatedBy = createdBy,
+			Status = donorAddView.Status,
+			BloodType = bloodType
+		};
+
+		_context.Donors.Add(donor);
+		await _context.SaveChangesAsync();
+
+		return RedirectToAction("Index");
+	}
+
+	[HttpGet]
+	public async Task<IActionResult> Index()
+	{
+		var donors = await _context.Donors
+			.Include(x => x.BloodType)
+			.Select(x => new DonorIndexViewModel
+			{
+				Id = x.Id,
+				Name = x.Name,
+				TemporaryAddress = x.TemporaryAddress,
+				PermanentAddress = x.PermanentAddress,
+				MobileNumber = x.MobileNumber,
+				SecondaryNumber = x.SecondaryNumber,
+				Email = x.Email,
+				Status = x.Status,
+				PhotoBase64 = x.Photo != null ? Convert.ToBase64String(x.Photo) : null,
+				BloodType = x.BloodType.Name,
+				CreatedBy = x.CreatedBy.Name
+			}).ToListAsync();
+		return View(donors);
+	}
+
+	[HttpGet]
+	public async Task<IActionResult> Update(int id)
+	{
+		var donor = await _context.Donors
+			.Include(x => x.BloodType)
+			.FirstOrDefaultAsync(x => x.Id == id);
+
+		if (donor == null)
+		{
+			return NotFound();
+		}
+
+		var bloodTypeList = await _context.BloodTypes.Select(x => new SelectListItem
+		{
+			Value = x.Id.ToString(),
+			Text = x.Name
+		}).ToListAsync();
+
+		var vm = new DonorUpdateViewModel
+		{
+			Id = donor.Id,
+			Name = donor.Name,
+			TemporaryAddress = donor.TemporaryAddress,
+			PermanentAddress = donor.PermanentAddress,
+			MobileNumber = donor.MobileNumber,
+			SecondaryNumber = donor.SecondaryNumber,
+			Email = donor.Email,
+			Status = donor.Status,
+			PhotoBase64 = donor.Photo != null ? Convert.ToBase64String(donor.Photo) : null,
+			BloodType = donor.BloodType.Id.ToString(),
+			BloodTypes = bloodTypeList
+		};
+
+		return View(vm);
+	}
 
 	[HttpPost]
 	public async Task<IActionResult> Update(DonorUpdateViewModel donorUpdateView)
 	{
-		
+
 		if (!ModelState.IsValid)
 		{
 			donorUpdateView.BloodTypes = await _context.BloodTypes.Select(x => new SelectListItem
@@ -300,6 +297,15 @@ namespace RedCross_System.Controllers;
 			stream.Position = 0;
 
 			return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "DonorProfile.xlsx");
+		}
+
+	}
+	private async Task<byte[]> ConvertIFormFileToByteArray(IFormFile file)
+	{
+		using (var memoryStream = new MemoryStream())
+		{
+			await file.CopyToAsync(memoryStream);
+			return memoryStream.ToArray();
 		}
 	}
 }

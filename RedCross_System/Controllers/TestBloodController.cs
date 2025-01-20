@@ -43,8 +43,7 @@ namespace RedCross_System.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Add()
 		{
-			
-
+		
 			var donations = await _context.Donations.Select(d => new SelectListItem
 			{
 				Value = d.Id.ToString(),
