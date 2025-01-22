@@ -1,0 +1,117 @@
+﻿@model RedCross_System.ViewModel.Donation.DonationUpdateViewModel
+
+<div>
+  <h1 class="form-title">Donation</h1>
+  <form method="post" asp-action="Update" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label for="branch" class="form-label">Branch Name <span style="color: red;">*</span></label>
+        <select class="form-control" asp-for="Branch" asp-items="@Model.Branches">
+          <option value="">-- Select Branch --</option>
+        </select>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label for="donor" class="form-label">Donor Name <span style="color: red;">*</span></label>
+        <select class="form-control" asp-for="Donor" asp-items="@Model.Donors">
+          <option value="">-- Select Donor --</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="campaign" class="form-label">Campaign Name</label>
+      <select class="form-control" asp-for="Campaign" asp-items="@Model.Campaigns">
+        <option value=""></option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="bagNumber" class="form-label">Bag Number <span style="color: red;">*</span></label>
+      <input type="text" class="form-control" asp-for="BagNumber" />
+    </div>
+
+    <div class="form-group">
+      <label for="quantity" class="form-label">Blood Quantity (ml) <span style="color: red;">*</span></label>
+      <input type="number" class="form-control" asp-for="Quantity" min="1" />
+    </div>
+
+    <div class="form-group text-center">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
+</div>
+
+<style>
+  .form-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+    color: #333;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .col-md-6 {
+    flex: 1 1 48%; /* Adjust width for two columns */
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+  button.btn {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+    button.btn:hover {
+      background-color: #218838;
+    }
+
+  .text-center {
+    text-align: center;
+  }
+
+  form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 25px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+</style>

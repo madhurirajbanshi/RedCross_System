@@ -1,0 +1,230 @@
+﻿@model RedCross_System.ViewModel.Login.IndexViewModel
+@{
+  Layout = null;
+  }
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 20px;
+    }
+
+    .login-container {
+      background: white;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 12px;
+      padding: 30px 30px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-illustration {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .redcross-logo {
+      color: #E31837;
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .system-name {
+      color: #E31837;
+      font-size: 24px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .login-title {
+      color: #495057;
+      font-size: 18px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+      .form-group input {
+        width: 100%;
+        padding: 14px 45px 14px 16px;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+
+        .form-group input:focus {
+          border-color: #E31837;
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.1);
+        }
+
+      .form-group i {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #adb5bd;
+      }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #495057;
+      font-size: 14px;
+    }
+
+    .login-button {
+      background: #E31837;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+      .login-button:hover {
+        background: #c41230;
+      }
+
+    .additional-links {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+      .additional-links a {
+        color: #495057;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s ease;
+      }
+
+        .additional-links a:hover {
+          color: #E31837;
+        }
+
+    .alert-danger {
+      background: #fff5f5;
+      color: #E31837;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      border: 1px solid rgba(227, 24, 55, 0.2);
+    }
+
+    .divider {
+      margin: 10px 0; /* Reduced margin before and after OR */
+      text-align: center;
+      position: relative;
+    }
+
+      .divider::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 45%;
+        height: 1px;
+        background: #dee2e6;
+      }
+
+      .divider::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 50%;
+        width: 45%;
+        height: 1px;
+        background: #dee2e6;
+      }
+
+      .divider span {
+        background: white;
+        padding: 0 10px;
+        color: #6c757d;
+        font-size: 14px;
+      }
+
+ 
+
+  </style>
+
+  <div class="login-container">
+    <div class="header-illustration">
+      <div class="redcross-logo">
+        <i class="fas fa-plus"></i>
+      </div>
+      <div class="system-name">Red Cross System</div>
+      <div class="login-title">Sign in to your account</div>
+    </div>
+
+    <form asp-action="Index" method="post" class="login-form">
+      @if (!ViewData.ModelState.IsValid || ViewData["Error"] != null)
+      {
+        <div class="alert-danger">
+          @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+          {
+            <p>@error.ErrorMessage</p>
+          }
+          @if (ViewData["Error"] != null)
+          {
+            <p>@ViewData["Error"]</p>
+          }
+        </div>
+      }
+
+      <div class="form-group">
+        <input asp-for="UserName" type="text" placeholder="Username" required />
+        <i class="fas fa-user"></i>
+      </div>
+
+      <div class="form-group">
+        <input asp-for="Password" type="password" placeholder="Password" required />
+        <i class="fas fa-lock"></i>
+      </div>
+
+      <div class="remember-me">
+        <input type="checkbox" id="remember" />
+        <label for="remember">Remember me</label>
+      </div>
+
+      <button type="submit" class="login-button">Sign In</button>
+
+      <div class="divider">
+        <span>OR</span>
+      </div>
+
+      <div class="additional-links">
+        <a href="@Url.Action("ForgotPassword", "Login")">Forgot your password?</a>
+      </div>
+    </form>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
