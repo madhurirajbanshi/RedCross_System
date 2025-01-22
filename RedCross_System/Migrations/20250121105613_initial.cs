@@ -9,12 +9,31 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace RedCross_System.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialmigration : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "BloodRequirements",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false),
+                    Purpose = table.Column<string>(type: "longtext", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Status = table.Column<string>(type: "longtext", nullable: false),
+                    Document = table.Column<byte[]>(type: "longblob", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BloodRequirements", x => x.Id);
+                })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -90,9 +109,7 @@ namespace RedCross_System.Migrations
                     Email = table.Column<string>(type: "varchar(255)", nullable: false),
                     Password = table.Column<string>(type: "longtext", nullable: false),
                     Phone = table.Column<string>(type: "longtext", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
-                    PasswordResetToken = table.Column<string>(type: "longtext", nullable: true),
-                    PasswordResetTokenExpiration = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                    RoleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -260,6 +277,39 @@ namespace RedCross_System.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "BloodIssues",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    ReceiverName = table.Column<string>(type: "longtext", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Charge = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Status = table.Column<string>(type: "longtext", nullable: false),
+                    DonationId = table.Column<int>(type: "int", nullable: false),
+                    DonorId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BloodIssues", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BloodIssues_Donations_DonationId",
+                        column: x => x.DonationId,
+                        principalTable: "Donations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BloodIssues_Donors_DonorId",
+                        column: x => x.DonorId,
+                        principalTable: "Donors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "TestBloods",
                 columns: table => new
                 {
@@ -344,8 +394,18 @@ namespace RedCross_System.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "Email", "Name", "Password", "PasswordResetToken", "PasswordResetTokenExpiration", "Phone", "RoleId" },
-                values: new object[] { 1, "admin@gmail.com", "Madhuri", "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q", "default-reset-token", null, "98150999900", 1 });
+                columns: new[] { "Id", "Email", "Name", "Password", "Phone", "RoleId" },
+                values: new object[] { 1, "admin@gmail.com", "Madhuri", "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q", "98150999900", 1 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BloodIssues_DonationId",
+                table: "BloodIssues",
+                column: "DonationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BloodIssues_DonorId",
+                table: "BloodIssues",
+                column: "DonorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Branches_CountryId",
@@ -437,6 +497,12 @@ namespace RedCross_System.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "BloodIssues");
+
+            migrationBuilder.DropTable(
+                name: "BloodRequirements");
+
             migrationBuilder.DropTable(
                 name: "TestBloods");
 

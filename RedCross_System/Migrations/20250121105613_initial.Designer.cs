@@ -11,8 +11,8 @@ using RedCross_System.Data;
 namespace RedCross_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250120054506_Initial migration")]
-    partial class Initialmigration
+    [Migration("20250121105613_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,6 +21,80 @@ namespace RedCross_System.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("RedCross_System.Models.Domain.BloodIssue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Charge")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal>("Discount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("DonationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DonorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReceiverName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("Total")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DonationId");
+
+                    b.HasIndex("DonorId");
+
+                    b.ToTable("BloodIssues");
+                });
+
+            modelBuilder.Entity("RedCross_System.Models.Domain.BloodRequirement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<byte[]>("Document")
+                        .IsRequired()
+                        .HasColumnType("longblob");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BloodRequirements");
+                });
 
             modelBuilder.Entity("RedCross_System.Models.Domain.BloodType", b =>
                 {
@@ -450,12 +524,6 @@ namespace RedCross_System.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("PasswordResetToken")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("PasswordResetTokenExpiration")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -479,10 +547,28 @@ namespace RedCross_System.Migrations
                             Email = "admin@gmail.com",
                             Name = "Madhuri",
                             Password = "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q",
-                            PasswordResetToken = "default-reset-token",
                             Phone = "98150999900",
                             RoleId = 1
                         });
+                });
+
+            modelBuilder.Entity("RedCross_System.Models.Domain.BloodIssue", b =>
+                {
+                    b.HasOne("RedCross_System.Models.Domain.Donation", "Donation")
+                        .WithMany()
+                        .HasForeignKey("DonationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RedCross_System.Models.Domain.Donor", "Donor")
+                        .WithMany()
+                        .HasForeignKey("DonorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Donation");
+
+                    b.Navigation("Donor");
                 });
 
             modelBuilder.Entity("RedCross_System.Models.Domain.Branch", b =>

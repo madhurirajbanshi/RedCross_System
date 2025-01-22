@@ -38,6 +38,8 @@ public class ApplicationDbContext : DbContext
 	public DbSet<Donation> Donations { get; set; }
 	public DbSet<Country> Countries { get; set; }
 	public DbSet<TestBlood> TestBloods { get; set; }
+	public DbSet<BloodIssue> BloodIssues { get; set; }
+	public DbSet<BloodRequirement> BloodRequirements { get; set; }
 
 
 
@@ -70,7 +72,8 @@ public class ApplicationDbContext : DbContext
 		);
 
 		// Seeding User
-		var superAdminRole = new Role { Id = 1, Name = "SuperAdmin" };  // Make sure the role is added
+		var superAdminRole = new Role { Id = 1, Name = "SuperAdmin" };
+		
 		modelBuilder.Entity<User>().HasData(
 				new User
 				{
@@ -79,8 +82,7 @@ public class ApplicationDbContext : DbContext
 					Email = "admin@gmail.com",
 					Phone = "98150999900",
 					RoleId = superAdminRole.Id,
-					Password = "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q" ,// Make sure password is properly hashed
-          PasswordResetToken = "default-reset-token"
+					Password = "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q" ,
 				}
 		);
 

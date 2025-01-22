@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace RedCross_System.Models.Domain
@@ -14,8 +15,7 @@ namespace RedCross_System.Models.Domain
 		public string Phone { get; set; }
 		public Role Role { get; set; }
 		public int RoleId { get; set; }
-		public string? PasswordResetToken { get; set; }
-		public DateTime? PasswordResetTokenExpiration { get; set; }
+		
 
 	}
 }

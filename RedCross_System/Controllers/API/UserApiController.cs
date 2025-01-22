@@ -91,8 +91,6 @@ namespace RedCross_System.Controllers.API
 					Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
 					Phone = request.Phone,
 					RoleId = role.Id,
-					PasswordResetToken = null,
-					PasswordResetTokenExpiration = null
 				};
 
 				_context.Users.Add(user);

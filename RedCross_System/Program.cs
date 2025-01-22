@@ -4,17 +4,18 @@ using RedCross_System.Controllers;
 using RedCross_System.Helpers;
 using OfficeOpenXml;
 using RedCross_System.Data;
-using RedCross_System.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using RedCross_System.Service;
+using RedCross_System.Models.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 
 // Add session helper to service
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<SessionHelper>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -45,7 +46,6 @@ builder.Services.AddSession(options =>
 });
 
 // Add the EmailSender service
-builder.Services.AddSingleton<IEmailSender, EmailSender>();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();

@@ -1,0 +1,17 @@
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace RedCross_System.ViewModel.BloodIssue
+{
+	public class BloodIssueIndexViewModel
+	{
+		public int Id { get; set; }
+		public string ReceiverName { get; set; }
+		public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+		public decimal Charge { get; set; }
+		public decimal Discount { get; set; }
+		public decimal Total { get; set; }
+		public string Status { get; set; } 
+		public string Donation { get; set; }
+		public string Donor { get; set; }
+	}
+}

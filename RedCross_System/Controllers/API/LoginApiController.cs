@@ -7,7 +7,6 @@ using RedCross_System.ViewModel.Login;
 using System.Security.Claims;
 using RedCross_System.Helpers;
 using RedCross_System.Data;
-using RedCross_System.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System;
@@ -80,33 +79,6 @@ namespace RedCross_System.Controllers.Api
 			return Ok(new { message = "Logout successful." });
 		}
 
-		// API endpoint for Forgot Password (POST)
-		[HttpPost("forgotpassword")]
-		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordViewModel model)
-		{
-			if (ModelState.IsValid)
-			{
-				var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
-
-				if (user == null)
-				{
-					return NotFound(new { message = "No user found with this email address." });
-				}
-
-				var token = Guid.NewGuid().ToString();
-				user.PasswordResetToken = token;
-				user.PasswordResetTokenExpiration = DateTime.UtcNow.AddHours(1);
-				await _context.SaveChangesAsync();
-
-				var resetLink = Url.Action("ResetPassword", "Login", new { token = token }, protocol: Request.Scheme);
-				var emailBody = $"Please click <a href='{resetLink}'>here</a> to reset your password.";
-
-				await _emailSender.SendEmailAsync(model.Email, "Password Reset Request", emailBody);
-
-				return Ok(new { message = "Password reset link has been sent to your email." });
-			}
-
-			return BadRequest(new { message = "Invalid email address." });
-		}
+	
 	}
 }
