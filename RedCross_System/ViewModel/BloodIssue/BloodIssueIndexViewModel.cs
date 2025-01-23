@@ -13,5 +13,6 @@ namespace RedCross_System.ViewModel.BloodIssue
 		public string Status { get; set; } 
 		public string Donation { get; set; }
 		public string Donor { get; set; }
+		public string BloodRequirement { get; set; }
 	}
 }

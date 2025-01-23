@@ -60,11 +60,9 @@
                   <td>@donor.BloodType</td>
 
                   <td>
-                    <form asp-action="ToggleStatus" asp-route-id="@donor.Id" method="post">
-                      <button type="submit" class="btn btn-sm" style="background-color: @(donor.Status == "Active" ? "#28a745" : "#dc3545");">
-                        @(donor.Status == "Active" ? "Active" : "Inactive")
-                      </button>
-                    </form>
+                    <span class="badge @(donor.Status == "Active" ? "bg-success" : "bg-danger")">
+                      @donor.Status
+                    </span>
                   </td>
                   <td>
                     <div class="d-flex justify-content-center">
@@ -74,7 +72,11 @@
                       <a asp-action="ViewProfile" asp-route-id="@donor.Id" class="btn btn-info btn-sm">
                         <i class="fas fa-eye"></i> View Profile
                       </a>
-
+                      <form asp-action="ToggleStatus" asp-route-id="@donor.Id" method="post">
+                        <button type="submit" class="btn btn-status @(donor.Status == "Active" ? "btn-danger" : "btn-success")">
+                          @(donor.Status == "Active" ? "Deactivate" : "Activate")
+                        </button>
+                      </form>
 
                     </div>
                   </td>

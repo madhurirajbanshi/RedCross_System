@@ -14,5 +14,7 @@ namespace RedCross_System.ViewModel.BloodIssue
 		public List<SelectListItem>? Donations { get; set; }	
 		public List<SelectListItem>?Donors { get; set; }	
 		public string Donor { get; set; }
+		public List<SelectListItem>? BloodRequirements { get; set; }
+		public string BloodRequirement { get; set; }
 	}
 }

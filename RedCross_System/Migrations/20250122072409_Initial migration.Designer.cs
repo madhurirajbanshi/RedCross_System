@@ -11,8 +11,8 @@ using RedCross_System.Data;
 namespace RedCross_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250121105613_initial")]
-    partial class initial
+    [Migration("20250122072409_Initial migration")]
+    partial class Initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

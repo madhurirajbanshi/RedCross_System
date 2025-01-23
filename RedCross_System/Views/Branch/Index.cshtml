@@ -1,4 +1,5 @@
 ﻿@model List<RedCross_System.ViewModel.Branch.BranchIndexViewModel>
+
 <div class="container mt-4">
   <h1 class="text-left text-primary mb-4">Branch Management</h1>
   <div class="d-flex justify-content-start mb-3">
@@ -22,7 +23,6 @@
               <th>Province</th>
               <th>Country</th>
               <th>Status</th>
-
               <th>Action</th>
             </tr>
           </thead>
@@ -35,21 +35,23 @@
                   <td>@sn</td>
                   <td>@branch.BranchName</td>
                   <td>@branch.Location</td>
-                 
                   <td>@branch.Province</td>
                   <td>@branch.Country</td>
                   <td>
-                    <form asp-action="ToggleStatus" asp-route-id="@branch.BranchId" method="post">
-                      <button type="submit" class="btn btn-sm" style="background-color: @(branch.Status == "Active" ? "#28a745" : "#dc3545");">
-                        @(branch.Status == "Active" ? "Active" : "Inactive")
-                      </button>
-                    </form>
+                    <span class="badge @(branch.Status == "Active" ? "bg-success" : "bg-danger")">
+                      @branch.Status
+                    </span>
                   </td>
                   <td>
                     <div class="d-flex gap-2">
-                      <a asp-action="Update" asp-route-id="@branch.BranchId" class="btn btn-success btn-sm">
+                      <a asp-action="Update" asp-route-id="@branch.BranchId" class="btn btn-action btn-success">
                         <i class="fas fa-edit"></i> Update
                       </a>
+                      <form asp-action="ToggleStatus" asp-route-id="@branch.BranchId" method="post">
+                        <button type="submit" class="btn btn-action @(branch.Status == "Active" ? "btn-danger" : "btn-success")">
+                          @(branch.Status == "Active" ? "Deactivate" : "Activate")
+                        </button>
+                      </form>
                     </div>
                   </td>
                 </tr>
@@ -69,28 +71,6 @@
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js"></script>
 
 <style>
-  /* Table Styling */
-  .table th, .table td {
-    text-align: center;
-    vertical-align: middle;
-  }
-
-  /* Button Styling */
-  .btn-sm {
-    padding: 6px 12px;
-    font-size: 14px;
-  }
-
-  .btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
-  }
-
-    .btn-success:hover {
-      background-color: #218838;
-      border-color: #1e7e34;
-    }
-
   /* Card Header Styling */
   .card-header {
     background-color: #003366;
@@ -109,19 +89,55 @@
   /* Flexbox for action buttons */
   .d-flex {
     display: flex;
-    gap: 10px;
+    gap: 6px; /* Reduced gap between buttons */
   }
 
-  /* Add some spacing for the table */
+  /* Fix Table Overflow */
+  .table-responsive {
+    overflow-x: auto; /* Enables horizontal scrolling for the table */
+    white-space: nowrap; /* Prevents content from wrapping */
+  }
+
+  /* Add spacing for the container */
   .container {
     padding-top: 20px;
   }
+
+  /* Fix Row Alignment */
+  .table tbody tr td {
+    overflow: hidden; /* Ensures content stays inside cells */
+    text-overflow: ellipsis; /* Adds "..." for overflowing text */
+  }
+
+  /* Action Button Styling */
+  .btn-action {
+    font-size: 14px; /* Larger font size */
+    padding: 8px 16px; /* Larger padding for a bigger button */
+    text-align: center;
+  }
+
+  /* Button Success and Danger for Action Buttons */
+  .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+  }
+
+  .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+
+  .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+  }
+
+ 
 </style>
-
-
-
-
-
-
-
-  

@@ -33,10 +33,17 @@ namespace RedCross_System.Controllers
 				Text = d.Name
 			}).ToListAsync();
 
+			var bloodrequirements = await _context.BloodRequirements.Select(d => new SelectListItem
+			{
+				Value = d.Id.ToString(),
+				Text = d.Name
+			}).ToListAsync();
+
 			var viewModel = new BloodIssueAddViewModel
 			{
 				Donations = donations,
-				Donors = donors
+				Donors = donors,
+				BloodRequirements = bloodrequirements
 			};
 
 			return View(viewModel);
@@ -60,9 +67,18 @@ namespace RedCross_System.Controllers
 					Text = d.Name
 				}).ToListAsync();
 
+				var bloodrequirements = await _context.BloodRequirements.Select(d => new SelectListItem
+				{
+					Value = d.Id.ToString(),
+					Text = d.Name
+				}).ToListAsync();
+
+
 				var donation = await _context.Donations.FindAsync(int.Parse(model.Donation));
 				var donor = await _context.Donors.FindAsync(int.Parse(model.Donor));
-				if (donation == null || donor == null)
+				var bloodRequirement = await _context.BloodRequirements.FindAsync(int.Parse(model.BloodRequirement));
+
+				if (donation == null || donor == null || bloodRequirement == null)
 				{
 					ModelState.AddModelError("", "Invalid  Donation selected.");
 					return View(model);
@@ -77,7 +93,8 @@ namespace RedCross_System.Controllers
 					Total = model.Total,
 					Status = model.Status,
 					Donation = donation,
-					Donor = donor
+					Donor = donor,
+					BloodRequirement = bloodRequirement
 				};
 
 				_context.BloodIssues.Add(bloodIssue);
@@ -92,7 +109,7 @@ namespace RedCross_System.Controllers
 		public async Task<IActionResult> ToggleStatus(int id)
 		{
 			var bloodissue = await _context.BloodIssues.FindAsync(id);
-			if (bloodissue == null) throw new Exception("Branch Not Found");
+			if (bloodissue == null) throw new Exception("BloodIssue Not Found");
 
 			bloodissue.Status = bloodissue.Status == "Active" ? "Inactive" : "Active";
 
@@ -107,10 +124,12 @@ namespace RedCross_System.Controllers
 			var bloodIssues = await _context.BloodIssues
 					.Include(b => b.Donation)
 					.Include(b => b.Donor)
+					.Include(b => b.BloodRequirement)
 					.ToListAsync();
 
 			var viewModel = bloodIssues.Select(b => new BloodIssueIndexViewModel
 			{
+				Id = b.Id,
 				ReceiverName = b.ReceiverName,
 				CreatedDate = b.CreatedDate,
 				Charge = b.Charge,
@@ -118,19 +137,19 @@ namespace RedCross_System.Controllers
 				Total = b.Total,
 				Status = b.Status,
 				Donation = b.Donation.BagNumber,
-				Donor = b.Donor.Name
+				Donor = b.Donor.Name,
+				BloodRequirement = b.BloodRequirement.Name
 			}).ToList();
 
 			return View(viewModel);
 		}
-
-
 		[HttpGet]
 		public async Task<IActionResult> Update(int id)
 		{
 			var bloodIssue = await _context.BloodIssues
 					.Include(b => b.Donation)
 					.Include(b => b.Donor)
+					.Include(b => b.BloodRequirement)
 					.FirstOrDefaultAsync(b => b.Id == id);
 
 			if (bloodIssue == null)
@@ -141,18 +160,27 @@ namespace RedCross_System.Controllers
 			var donations = await _context.Donations.Select(d => new SelectListItem
 			{
 				Value = d.Id.ToString(),
-				Text = d.BagNumber
+				Text = d.BagNumber,
+				Selected = d.Id == bloodIssue.Donation.Id
 			}).ToListAsync();
 
 			var donors = await _context.Donors.Select(d => new SelectListItem
 			{
 				Value = d.Id.ToString(),
-				Text = d.Name
+				Text = d.Name,
+				Selected = d.Id == bloodIssue.Donor.Id
+			}).ToListAsync();
+
+			var bloodRequirements = await _context.BloodRequirements.Select(b => new SelectListItem
+			{
+				Value = b.Id.ToString(),
+				Text = b.Name,
+				Selected = b.Id == bloodIssue.BloodRequirement.Id
 			}).ToListAsync();
 
 			var viewModel = new BloodIssueUpdateViewModel
 			{
-				Id=bloodIssue.Id,
+				Id = bloodIssue.Id,
 				ReceiverName = bloodIssue.ReceiverName,
 				CreatedDate = bloodIssue.CreatedDate,
 				Charge = bloodIssue.Charge,
@@ -161,8 +189,10 @@ namespace RedCross_System.Controllers
 				Status = bloodIssue.Status,
 				Donation = bloodIssue.Donation.Id.ToString(),
 				Donor = bloodIssue.Donor.Id.ToString(),
+				BloodRequirement = bloodIssue.BloodRequirement.Id.ToString(),
 				Donations = donations,
-				Donors = donors
+				Donors = donors,
+				BloodRequirements = bloodRequirements
 			};
 
 			return View(viewModel);
@@ -170,50 +200,89 @@ namespace RedCross_System.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Update(int id, BloodIssueUpdateViewModel model)
+		public async Task<IActionResult> Update(BloodIssueUpdateViewModel model)
 		{
-			if (id != model.Id)
+			if (!ModelState.IsValid)
+			{
+				model.Donations = await _context.Donations.Select(d => new SelectListItem
+				{
+					Value = d.Id.ToString(),
+					Text = d.BagNumber
+				}).ToListAsync();
+
+				model.Donors = await _context.Donors.Select(d => new SelectListItem
+				{
+					Value = d.Id.ToString(),
+					Text = d.Name
+				}).ToListAsync();
+
+				model.BloodRequirements = await _context.BloodRequirements.Select(b => new SelectListItem
+				{
+					Value = b.Id.ToString(),
+					Text = b.Name
+				}).ToListAsync();
+
+				return View(model);
+			}
+
+			var bloodIssue = await _context.BloodIssues
+					.Include(b => b.Donation)
+					.Include(b => b.Donor)
+					.Include(b => b.BloodRequirement)
+					.FirstOrDefaultAsync(b => b.Id == model.Id);
+
+			if (bloodIssue == null)
 			{
 				return NotFound();
 			}
 
-			if (ModelState.IsValid)
+			var donation = await _context.Donations.FindAsync(int.Parse(model.Donation));
+			var donor = await _context.Donors.FindAsync(int.Parse(model.Donor));
+			var bloodRequirement = await _context.BloodRequirements.FindAsync(int.Parse(model.BloodRequirement));
+
+			if (donation == null || donor == null || bloodRequirement == null)
 			{
-				model.Total = model.Charge - (model.Charge * model.Discount / 100);
+				ModelState.AddModelError("", "Invalid selections for Donation, Donor, or Blood Requirement.");
 
-				var bloodIssue = await _context.BloodIssues.FindAsync(id);
-				if (bloodIssue == null)
+				model.Donations = await _context.Donations.Select(d => new SelectListItem
 				{
-					return NotFound();
-				}
+					Value = d.Id.ToString(),
+					Text = d.BagNumber
+				}).ToListAsync();
 
-				var donation = await _context.Donations.FindAsync(int.Parse(model.Donation));
-				var donor = await _context.Donors.FindAsync(int.Parse(model.Donor));
-
-				if (donation == null || donor == null)
+				model.Donors = await _context.Donors.Select(d => new SelectListItem
 				{
-					ModelState.AddModelError("", "Invalid Donation or Donor selected.");
-					return View(model);
-				}
+					Value = d.Id.ToString(),
+					Text = d.Name
+				}).ToListAsync();
 
-				bloodIssue.ReceiverName = model.ReceiverName;
-				bloodIssue.CreatedDate = model.CreatedDate;
-				bloodIssue.Charge = model.Charge;
-				bloodIssue.Discount = model.Discount;
-				bloodIssue.Total = model.Total;
-				bloodIssue.Status = model.Status;
-				bloodIssue.Donation = donation;
-				bloodIssue.Donor = donor;
+				model.BloodRequirements = await _context.BloodRequirements.Select(b => new SelectListItem
+				{
+					Value = b.Id.ToString(),
+					Text = b.Name
+				}).ToListAsync();
 
-				_context.BloodIssues.Update(bloodIssue);
-				await _context.SaveChangesAsync();
-
-				return RedirectToAction(nameof(Index));
+				return View(model);
 			}
 
-			return View(model);
+			bloodIssue.ReceiverName = model.ReceiverName;
+			bloodIssue.CreatedDate = model.CreatedDate;
+			bloodIssue.Charge = model.Charge;
+			bloodIssue.Discount = model.Discount;
+			bloodIssue.Total = model.Charge - (model.Charge * model.Discount / 100);
+			bloodIssue.Status = model.Status;
+			bloodIssue.Donation = donation;
+			bloodIssue.Donor = donor;
+			bloodIssue.BloodRequirement = bloodRequirement;
+
+			_context.BloodIssues.Update(bloodIssue);
+			await _context.SaveChangesAsync();
+
+			return RedirectToAction(nameof(Index));
 		}
-	}
+
 
 	}
+
+}
 
