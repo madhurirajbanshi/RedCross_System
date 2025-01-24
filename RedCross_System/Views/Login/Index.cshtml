@@ -173,8 +173,6 @@
         font-size: 14px;
       }
 
- 
-
   </style>
 
   <div class="login-container">
@@ -194,10 +192,7 @@
           {
             <p>@error.ErrorMessage</p>
           }
-          @if (ViewData["Error"] != null)
-          {
-            <p>@ViewData["Error"]</p>
-          }
+         
         </div>
       }
 
@@ -223,7 +218,7 @@
       </div>
 
       <div class="additional-links">
-        <a href="@Url.Action("ForgotPassword", "Login")">Forgot your password?</a>
+        <a href="@Url.Action("Index", "Register")">Register New Account</a>
       </div>
     </form>
   </div>

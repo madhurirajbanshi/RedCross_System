@@ -11,7 +11,7 @@ using RedCross_System.Data;
 namespace RedCross_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250122072409_Initial migration")]
+    [Migration("20250124061452_Initial migration")]
     partial class Initialmigration
     {
         /// <inheritdoc />
@@ -26,6 +26,9 @@ namespace RedCross_System.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("BloodRequirementId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Charge")
@@ -55,6 +58,8 @@ namespace RedCross_System.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BloodRequirementId");
 
                     b.HasIndex("DonationId");
 
@@ -463,6 +468,11 @@ namespace RedCross_System.Migrations
                         {
                             Id = 4,
                             Name = "BranchUser"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "NormalUser"
                         });
                 });
 
@@ -554,6 +564,12 @@ namespace RedCross_System.Migrations
 
             modelBuilder.Entity("RedCross_System.Models.Domain.BloodIssue", b =>
                 {
+                    b.HasOne("RedCross_System.Models.Domain.BloodRequirement", "BloodRequirement")
+                        .WithMany()
+                        .HasForeignKey("BloodRequirementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RedCross_System.Models.Domain.Donation", "Donation")
                         .WithMany()
                         .HasForeignKey("DonationId")
@@ -565,6 +581,8 @@ namespace RedCross_System.Migrations
                         .HasForeignKey("DonorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("BloodRequirement");
 
                     b.Navigation("Donation");
 

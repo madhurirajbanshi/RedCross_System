@@ -8,6 +8,13 @@
     {
       <div class="col-md-4 mb-4">
         <div class="card text-white bg-danger shadow-lg h-100">
+          <div>
+          
+            <span class="badge bg-light text-danger fw-bold position-absolute top-0 end-0 m-2"
+                  style="font-size: 0.8rem; padding: 0.25em 0.5em;">@controller.Count</span>
+         </div>
+
+
           <div class="card-body">
             <div class="d-flex align-items-center">
               <i class="controller-icon fa
@@ -16,8 +23,12 @@
                   controller.Controller == "User" ? "fa-users" :
                   controller.Controller == "Donation" ? "fa-donate" :
                   controller.Controller == "Branch" ? "fa-building" :
-                  controller.Controller == "TestBlood" ? "fa-tint" : "") fa-2x me-3"></i> <!-- Adjusted icon size and margin -->
-              <h5 class="card-title mt-0" style="font-size: 1.5rem;">@controller.Name</h5> <!-- Aligned the title -->
+                  controller.Controller == "TestBlood" ? "fa-tint" : "") fa-2x me-3"></i>
+              <div>
+              <h5 class="card-title mt-0" style="font-size: 1.5rem;">@controller.Name</h5>
+              @* class="position-absolute top-0 start-0 m-2"> *@
+              
+              </div>
             </div>
           </div>
           <div class="card-footer text-center">

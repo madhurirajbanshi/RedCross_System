@@ -289,11 +289,18 @@ namespace RedCross_System.Migrations
                     Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<string>(type: "longtext", nullable: false),
                     DonationId = table.Column<int>(type: "int", nullable: false),
-                    DonorId = table.Column<int>(type: "int", nullable: false)
+                    DonorId = table.Column<int>(type: "int", nullable: false),
+                    BloodRequirementId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BloodIssues", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BloodIssues_BloodRequirements_BloodRequirementId",
+                        column: x => x.BloodRequirementId,
+                        principalTable: "BloodRequirements",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BloodIssues_Donations_DonationId",
                         column: x => x.DonationId,
@@ -375,7 +382,8 @@ namespace RedCross_System.Migrations
                     { 1, "SuperAdmin" },
                     { 2, "ProvinceUser" },
                     { 3, "DistrictUser" },
-                    { 4, "BranchUser" }
+                    { 4, "BranchUser" },
+                    { 5, "NormalUser" }
                 });
 
             migrationBuilder.InsertData(
@@ -396,6 +404,11 @@ namespace RedCross_System.Migrations
                 table: "Users",
                 columns: new[] { "Id", "Email", "Name", "Password", "Phone", "RoleId" },
                 values: new object[] { 1, "admin@gmail.com", "Madhuri", "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q", "98150999900", 1 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BloodIssues_BloodRequirementId",
+                table: "BloodIssues",
+                column: "BloodRequirementId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BloodIssues_DonationId",
@@ -501,10 +514,10 @@ namespace RedCross_System.Migrations
                 name: "BloodIssues");
 
             migrationBuilder.DropTable(
-                name: "BloodRequirements");
+                name: "TestBloods");
 
             migrationBuilder.DropTable(
-                name: "TestBloods");
+                name: "BloodRequirements");
 
             migrationBuilder.DropTable(
                 name: "Donations");

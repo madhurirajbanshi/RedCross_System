@@ -465,6 +465,11 @@ namespace RedCross_System.Migrations
                         {
                             Id = 4,
                             Name = "BranchUser"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "NormalUser"
                         });
                 });
 
