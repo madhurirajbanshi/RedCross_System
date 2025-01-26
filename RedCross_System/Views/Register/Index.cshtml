@@ -1,0 +1,503 @@
+﻿@model RedCross_System.ViewModel.Register.RegisterViewModel
+
+@{
+  ViewData["Title"] = "Register";
+}
+
+@{
+  Layout = null;
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<div class="login-container">
+  <div class="header-illustration">
+    
+    <div class="system-name">
+      <span>
+        <img src="~/uploads/RedCrossLogo.png" alt="RedCrossSystem Logo" class="brand-image img-circle elevation-3"
+             style="opacity: .8">
+      </span>Red Cross System
+    </div>
+  </div>
+
+  <form asp-action="Index" method="post" class="login-form">
+    @if (!ViewData.ModelState.IsValid || ViewData["Error"] != null)
+    {
+      <div class="alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+          <p>@error.ErrorMessage</p>
+        }
+
+      </div>
+    }
+
+    <div class="form-group">
+        <div class="form-group">
+          <i class="fas fa-user"></i>
+          <input asp-for="UserName" class="form-control" placeholder="username" />
+          <span asp-validation-for="UserName" class="text-danger"></span>
+
+
+    </div>
+
+    <div class="form-group">
+          <i class="fas fa-envelope"></i>
+          <input asp-for="Email" type="email" class="form-control" placeholder="Email"/>
+          <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+        <div class="form-group">
+          <i class="fas fa-phone"></i>
+          <input asp-for="Phone" class="form-control"  placeholder="Phone"/>
+          <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+          <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+          <i class="fas fa-lock"></i>
+          <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="ConfirmPassword" />
+          <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+          @Html.DropDownListFor(model => model.RoleId, new SelectList(Model.Roles, "Value", "Text"), "-- Select Role --", new { @class = "form-control" })
+        </div>
+
+      <div class="button-container">
+        <a href="@Url.Action("Index", "Login")" class="login-btn">Login</a>
+        <button type="submit" class="login-btn">Signup</button>
+      </div>
+
+
+      
+
+
+        </div>
+
+      </form>
+    </div>
+
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<style>
+  * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 20px;
+}
+
+.login-container {
+  background: white;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.header-illustration {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.redcross-logo {
+  color: #E31837;
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.system-name {
+  color: #E31837;
+  font-size: 24px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.login-title {
+  color: #495057;
+  font-size: 18px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 14px 45px 14px 16px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: #E31837;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.1);
+}
+
+.form-group i {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #adb5bd;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #495057;
+  font-size: 14px;
+}
+
+.login-button {
+  background: #E31837;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  width: 100%;
+  text-align: center; 
+}
+
+.login-button:hover {
+  background: #c41230;
+}
+
+.additional-links {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.additional-links a {
+  color: #495057;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.additional-links a:hover {
+  color: #E31837;
+}
+
+.alert-danger {
+  background: #fff5f5;
+  color: #E31837;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  border: 1px solid rgba(227, 24, 55, 0.2);
+}
+
+.divider {
+  margin: 10px 0;
+  text-align: center;
+  position: relative;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background: #dee2e6;
+}
+
+.divider::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background: #dee2e6;
+}
+
+.divider span {
+  background: white;
+  padding: 0 10px;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+  .form-group {
+    position: relative;
+  }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px 14px 45px; 
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+      .form-group input:focus {
+        border-color: #E31837;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.1);
+      }
+
+      .form-group input::placeholder {
+        text-align: left;
+      }
+    .form-group i {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #adb5bd;
+    }
+
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px 14px 45px; 
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+      .form-group input::placeholder {
+        text-align: left; 
+      }
+
+    .form-group i {
+      position: absolute;
+      left: 16px; /* Move the icon to the left side */
+      top: 50%;
+      transform: translateY(-50%);
+      color: #adb5bd;
+    }
+
+  .form-group {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+    .form-group select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background-color: #fff;
+    }
+
+      .form-group select:focus {
+        border-color: #E31837;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.1);
+      }
+
+      .form-group select option {
+        padding: 10px;
+      }
+
+        /* Optional: Add a background color for the dropdown options */
+        .form-group select option:checked {
+          background-color: #E31837;
+          color: white;
+        }
+
+    .form-group i {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #adb5bd;
+    }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px;
+    margin: 0; /* Remove default margin from body */
+  }
+
+  .login-container {
+    background: white;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    padding: 20px 30px; /* Adjust padding inside container */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    max-height: 600px; /* Set a maximum height for the container */
+  }
+
+  /* Adjust width and margins for the form elements */
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Reduce the gap between the form elements */
+    margin-top: 10px;
+  }
+
+  /* Adjust the spacing between the "OR" and the buttons */
+  .login-container .or-divider {
+    margin: 15px 0; /* Reduced margin above and below the "OR" divider */
+    text-align: center;
+  }
+
+    .login-container .or-divider span {
+      background-color: #f0f0f0; /* Color for the divider line */
+      padding: 0 10px; /* Reduced horizontal padding for "OR" */
+      font-size: 14px; /* Smaller font size */
+    }
+
+  /* Adjust the space between the "Login" and "Register" buttons */
+  .login-container .login-btn,
+  .login-container .register-btn {
+    margin-top: 10px; /* Reduced margin between buttons */
+  }
+
+  /* Styles for the buttons */
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .login-btn, .register-btn {
+    background: #E31837;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 48%; /* Adjust the width so that buttons sit side by side */
+    text-align: center; /* Centers the text inside the button */
+    text-decoration: none; /* Remove underline from links */
+    display: inline-block; /* Ensure links behave like buttons */
+    text-align: center;
+  }
+
+    .login-btn:hover, .register-btn:hover {
+      background: #c41230;
+    }
+
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .login-btn, .register-btn {
+    background: #E31837;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 80%; /* Set width to 100% to make them both the same size */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+    .login-btn:hover, .register-btn:hover {
+      background: #c41230;
+    }
+
+  .header-illustration {
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: -20px; /* Moves the content upward */
+  }
+
+
+
+  .brand-image {
+    max-width: 30px; /* Adjust width as needed */
+    max-height: 30px; /* Adjust height as needed */
+    display: block;
+    margin: 0 auto;
+    border-radius: 50%;
+    object-fit: contain;
+    margin-bottom: -10px; /* Reduces space below the logo */
+  }
+
+  .brand-image {
+    max-width: 30px; /* Adjust width as needed */
+    max-height: 30px; /* Adjust height as needed */
+    display: block;
+    margin: 0 auto;
+    border-radius: 50%;
+    object-fit: contain;
+    margin-bottom: 10px; /* Added space below the image */
+  }
+
+  .system-name {
+    color: #E31837;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: -15px;
+    padding-top: 5px; /* Optional: Add space above the text */
+  }
+
+  .login-btn {
+    background: #E31837;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%; /* Ensures the button covers full width */
+    text-align: center; /* Centers the text inside the button */
+  }
+
+    .login-btn:hover {
+      background: #c41230;
+    }
+
+  
+
+</style>

@@ -10,5 +10,6 @@
 		public string Status { get; set; } = "Active";
 		public byte[] Document { get; set; }
 
+
 	}
 }

@@ -11,5 +11,6 @@
 		public string Status { get; set; } = "Active";
 		public Donation Donation { get; set; }
 		public Donor Donor { get; set; }	
+		public BloodRequirement BloodRequirement { get; set; }
 	}
 }

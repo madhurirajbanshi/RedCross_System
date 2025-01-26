@@ -68,7 +68,8 @@ public class ApplicationDbContext : DbContext
 				new Role { Id = 1, Name = "SuperAdmin" },
 				new Role { Id = 2, Name = "ProvinceUser" },
 				new Role { Id = 3, Name = "DistrictUser" },
-				new Role { Id = 4, Name = "BranchUser" }
+				new Role { Id = 4, Name = "BranchUser" },
+				new Role { Id=5,Name="NormalUser"}
 		);
 
 		// Seeding User

@@ -1,5 +1,4 @@
 ﻿@model RedCross_System.ViewModel.BloodIssue.BloodIssueUpdateViewModel
-
 <div>
   <h1 style="text-align:center">BloodIssue</h1>
   <form method="post" asp-action="Update" enctype="multipart/form-data">
@@ -10,11 +9,20 @@
     </div>
 
     <div class="mb-2">
+      <label for="bloodrequirement" class="form-label">Blood Requirement</label>
+      <select class="form-control" asp-for="BloodRequirement" asp-items="@Model.BloodRequirements">
+        <option value="">-- Select BloodRequirement --</option>
+      </select>
+    </div>
+
+    <div class="mb-2">
       <label for="donor" class="form-label">Donor</label>
       <select class="form-control" asp-for="Donor" asp-items="@Model.Donors">
         <option value="">-- Select Donor --</option>
       </select>
     </div>
+
+
 
     <div class="mb-2">
       <label for="province" class="form-label">Donation</label>

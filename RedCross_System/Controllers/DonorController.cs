@@ -120,21 +120,24 @@ public class DonorController : Controller
 	{
 		var donors = await _context.Donors
 			.Include(x => x.BloodType)
-			.Select(x => new DonorIndexViewModel
-			{
-				Id = x.Id,
-				Name = x.Name,
-				TemporaryAddress = x.TemporaryAddress,
-				PermanentAddress = x.PermanentAddress,
-				MobileNumber = x.MobileNumber,
-				SecondaryNumber = x.SecondaryNumber,
-				Email = x.Email,
-				Status = x.Status,
-				PhotoBase64 = x.Photo != null ? Convert.ToBase64String(x.Photo) : null,
-				BloodType = x.BloodType.Name,
-				CreatedBy = x.CreatedBy.Name
-			}).ToListAsync();
-		return View(donors);
+			.Include(x => x.CreatedBy)
+			.ToListAsync();
+
+		var re = donors.Select(x => new DonorIndexViewModel
+		{
+			Id = x.Id,
+			Name = x.Name,
+			TemporaryAddress = x.TemporaryAddress,
+			PermanentAddress = x.PermanentAddress,
+			MobileNumber = x.MobileNumber,
+			SecondaryNumber = x.SecondaryNumber,
+			Email = x.Email,
+			Status = x.Status,
+			PhotoBase64 = x.Photo != null ? Convert.ToBase64String(x.Photo) : null,
+			BloodType = x.BloodType.Name,
+			CreatedBy = x.CreatedBy.Name
+		}).ToList();
+		return View(re);
 	}
 
 	[HttpGet]

@@ -1,17 +1,18 @@
 ﻿@model List<RedCross_System.ViewModel.BloodIssue.BloodIssueIndexViewModel>
 
+
 <div class="container mt-4">
-  <h1 class="text-left  text-primary mb-4">BloodIssue List</h1>
+  <h1 class="text-left  text-primary mb-4">BloodIssue</h1>
   <div class="d-flex justify-content-start mb-3 gap-2">
     <a asp-action="Add" asp-controller="BloodIssue" class="btn btn-primary" style="text-decoration: none;">
-      <i class="fas fa-plus"></i> Add BloodIssue
+      <i class="fas fa-plus"></i> Add
     </a>
-    
+
   </div>
 
   <div class="card card-primary">
     <div class="card-header">
-      <h3 class="card-title">BloodIssue Information</h3>
+      <h3 class="card-title">BloodIssue</h3>
     </div>
     <div class="card-body">
       <div class="table-responsive">
@@ -20,41 +21,50 @@
             <tr>
               <th>SN</th>
               <th>Receiver Name</th>
-              <th>Donor Name</th>
-              <th>BagNumber</th>
+              <th>Blood Requirement</th>
+              <th>Donor</th>
+              <th>Donation</th>
               <th>Charge</th>
               <th>Discount</th>
               <th>Total</th>
               <th>Status</th>
               <th>Action</th>
+
+
             </tr>
           </thead>
           <tbody>
             @{
               long sn = 1;
-              foreach (var bloodissue in Model)
+              foreach (var BloodIssue in Model)
               {
                 <tr>
                   <td>@sn</td>
-                  <td>@bloodissue.ReceiverName</td>
-                  <td>@bloodissue.Donor</td>
-                  <td>@bloodissue.Donation</td>
-                  <td>@bloodissue.Charge</td>
-                  <td>@bloodissue.Discount</td>
-                  <td>@bloodissue.Total</td>
+                  <td>@BloodIssue.ReceiverName</td>
+                  <td>@BloodIssue.BloodRequirement</td>
+                  <td>@BloodIssue.Donor</td>
+                  <td>@BloodIssue.Donation</td>
+                  <td>@BloodIssue.Charge</td>
+                  <td>@BloodIssue.Discount</td>
+                  <td>@BloodIssue.Total</td>
+
+                  
                   <td>
-                    <form asp-action="ToggleStatus" asp-route-id="@bloodissue.Id" method="post">
-                      <button type="submit" class="btn btn-sm" style="background-color: @(bloodissue.Status == "Active" ? "#28a745" : "#dc3545");">
-                        @(bloodissue.Status == "Active" ? "Active" : "Inactive")
-                      </button>
-                    </form>
+                    <span class="badge @(BloodIssue.Status == "Active" ? "bg-success" : "bg-danger")">
+                      @BloodIssue.Status
+                    </span>
+
                   </td>
                   <td>
                     <div class="d-flex gap-2">
-                      <a asp-action="Update" asp-route-id="@bloodissue.Id" class="btn btn-success btn-sm">
+                      <a asp-action="Update" asp-route-id="@BloodIssue.Id" class="btn btn-success btn-sm">
                         <i class="fas fa-edit"></i> Update
                       </a>
-                     
+                      <form asp-action="ToggleStatus" asp-route-id="@BloodIssue.Id" method="post">
+                        <button type="submit" class="btn btn-status @(BloodIssue.Status == "Active" ? "btn-danger" : "btn-success")">
+                          @(BloodIssue.Status == "Active" ? "Deactivate" : "Activate")
+                        </button>
+                      </form>
                     </div>
                   </td>
                 </tr>

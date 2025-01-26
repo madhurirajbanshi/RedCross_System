@@ -53,6 +53,7 @@ namespace RedCross_System.Controllers
 						case "BranchUser":
 						case "DistrictUser":
 						case "SuperAdmin":
+						case "NormalUser":
 							return RedirectToAction("Index", "Home");
 						default:
 							ModelState.AddModelError("", "Invalid role type.");

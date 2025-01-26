@@ -7,6 +7,13 @@
       <label for="" class="form-label">Receiver Name</label>
       <input type="text" class="form-control" asp-for="ReceiverName" />
     </div>
+
+    <div class="mb-2">
+      <label for="bloodrequirement" class="form-label">Blood Requirement</label>
+      <select class="form-control" asp-for="BloodRequirement" asp-items="@Model.BloodRequirements">
+        <option value="">-- Select BloodRequirement --</option>
+      </select>
+    </div>
  
     <div class="mb-2">
       <label for="donor" class="form-label">Donor</label>
