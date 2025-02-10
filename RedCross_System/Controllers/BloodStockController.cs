@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
 using RedCross_System.Models.Domain;
@@ -9,8 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace RedCross_System.Controllers;
-
-	public class BloodStockController : Controller
+public class BloodStockController : Controller
 	{
 		private readonly ApplicationDbContext _context;
 

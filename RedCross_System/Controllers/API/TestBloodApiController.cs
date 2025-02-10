@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
 using RedCross_System.Helpers;
@@ -11,6 +12,7 @@ namespace RedCross_System.Controllers.Api
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class TestBloodApiController : ControllerBase
 	{
 		private readonly ApplicationDbContext _context;

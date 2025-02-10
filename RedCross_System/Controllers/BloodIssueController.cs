@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
@@ -119,6 +120,8 @@ namespace RedCross_System.Controllers
 			return RedirectToAction("Index");
 		}
 
+		[HttpGet]
+	
 		public async Task<IActionResult> Index()
 		{
 			var bloodIssues = await _context.BloodIssues

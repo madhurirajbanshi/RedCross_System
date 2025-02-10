@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
@@ -28,9 +29,16 @@ namespace RedCross_System.Controllers
 				Text = x.Name,
 			}).ToListAsync();
 
+			var bloodTypes = await _context.BloodTypes.Select(x => new SelectListItem()
+			{
+				Value = x.Id.ToString(),
+				Text = x.Name,
+			}).ToListAsync();
+
 			var vm = new UserAddViewModel
 			{
-				Roles = roles
+				Roles = roles,
+				BloodTypes=bloodTypes
 			};
 
 			return View(vm);
@@ -53,7 +61,15 @@ namespace RedCross_System.Controllers
 					Text = x.Name,
 				}).ToListAsync();
 
+				var bloodTypes = await _context.BloodTypes.Select(x => new SelectListItem()
+				{
+					Value = x.Id.ToString(),
+					Text = x.Name,
+				}).ToListAsync();
+
+
 				vm.Roles = roles;
+				vm.BloodTypes = bloodTypes;
 				return View(vm);
 			}
 
@@ -67,12 +83,21 @@ namespace RedCross_System.Controllers
 					Text = x.Name,
 				}).ToListAsync();
 
+				var bloodTypes = await _context.BloodTypes.Select(x => new SelectListItem()
+				{
+					Value = x.Id.ToString(),
+					Text = x.Name,
+				}).ToListAsync();
+
 				vm.Roles = roles;
+				vm.BloodTypes = bloodTypes;
 				return View(vm);
 			}
 
 			var role = await _context.Roles.FindAsync(int.Parse(vm.Role));
-			if (role == null)
+			var bloodType = await _context.BloodTypes.FindAsync(int.Parse(vm.BloodType));
+
+			if (role == null||bloodType==null)
 			{
 				ModelState.AddModelError("", "The selected role was not found.");
 				return View(vm);
@@ -85,6 +110,7 @@ namespace RedCross_System.Controllers
 				Password = BCrypt.Net.BCrypt.HashPassword(vm.Password),
 				Phone = vm.Phone,
 				Role = role,
+				BloodType=bloodType
 			};
 
 			await _context.Users.AddAsync(user);
@@ -98,12 +124,14 @@ namespace RedCross_System.Controllers
 		{
 			var users = await _context.Users
 					.Include(x => x.Role)
+					.Include(x=>x.BloodType)
 					.Select(x => new UserIndexViewModel()
 					{
 						Id = x.Id,
 						Name = x.Name,
 						Email = x.Email,
 						Role = x.Role.Name,
+						BloodType=x.BloodType.Name
 					})
 					.ToListAsync();
 
@@ -115,6 +143,7 @@ namespace RedCross_System.Controllers
 		{
 			var user = await _context.Users
 					.Include(x => x.Role)
+					.Include(x=>x.BloodType)
 					.FirstOrDefaultAsync(x => x.Id == id);
 
 			if (user == null)
@@ -128,6 +157,13 @@ namespace RedCross_System.Controllers
 				Text = x.Name,
 			}).ToListAsync();
 
+			var bloodTypes = await _context.BloodTypes.Select(x => new SelectListItem()
+			{
+				Value = x.Id.ToString(),
+				Text = x.Name,
+			}).ToListAsync();
+
+
 			var vm = new UserUpdateViewModel()
 			{
 				Id = user.Id,
@@ -135,7 +171,8 @@ namespace RedCross_System.Controllers
 				Email = user.Email,
 				Password = user.Password,
 				Role = user.Role.Id.ToString(),
-				Roles = roles
+				Roles = roles,
+				BloodTypes=bloodTypes
 			};
 
 			return View(vm);
@@ -152,10 +189,16 @@ namespace RedCross_System.Controllers
 					Text = x.Name,
 				}).ToListAsync();
 
+				vm.BloodTypes = await _context.BloodTypes.Select(x => new SelectListItem()
+				{
+					Value = x.Id.ToString(),
+					Text = x.Name,
+				}).ToListAsync();
+
 				return View(vm);
 			}
 
-			var user = await _context.Users.Include(x => x.Role)
+			var user = await _context.Users.Include(x => x.Role).Include(x=>x.BloodTypeId)
 					.FirstOrDefaultAsync(x => x.Id == vm.Id);
 
 			if (user == null)
@@ -164,10 +207,18 @@ namespace RedCross_System.Controllers
 			}
 
 			var role = await _context.Roles.FindAsync(int.Parse(vm.Role));
-			if (role == null)
+			var bloodType = await _context.BloodTypes.FindAsync(int.Parse(vm.BloodType));
+
+			if (role == null ||bloodType==null)
 			{
 				ModelState.AddModelError(nameof(vm.Role), "Invalid role selected.");
 				vm.Roles = await _context.Roles.Select(x => new SelectListItem()
+				{
+					Value = x.Id.ToString(),
+					Text = x.Name,
+				}).ToListAsync();
+
+				vm.BloodTypes = await _context.BloodTypes.Select(x => new SelectListItem()
 				{
 					Value = x.Id.ToString(),
 					Text = x.Name,
@@ -185,7 +236,7 @@ namespace RedCross_System.Controllers
 			}
 
 			user.Role = role;
-
+			user.BloodType = bloodType;
 			_context.Users.Update(user);
 			await _context.SaveChangesAsync();
 

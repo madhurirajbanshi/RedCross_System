@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
+using RedCrossSystem.Core.src.ProvinceFeature;
 
 namespace RedCross_System.Data;
 
@@ -40,13 +41,13 @@ public class ApplicationDbContext : DbContext
 	public DbSet<TestBlood> TestBloods { get; set; }
 	public DbSet<BloodIssue> BloodIssues { get; set; }
 	public DbSet<BloodRequirement> BloodRequirements { get; set; }
-
+	public DbSet<ProvinceOfficeEntity> ProvinceOfficeEntities { get; set; }
 
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		base.OnModelCreating(modelBuilder);
-
+		modelBuilder.Entity<ProvinceOfficeEntity>().ToTable("ProvinceOfficeEntities");
 
 		// Seeding Country
 		var country = new Country { Id = 1, Name = "Nepal" };
@@ -72,9 +73,19 @@ public class ApplicationDbContext : DbContext
 				new Role { Id=5,Name="NormalUser"}
 		);
 
-		// Seeding User
+		modelBuilder.Entity<BloodType>().HasData(
+			new BloodType { Id = 1, Name = "A+" },
+			new BloodType { Id = 2, Name = "A-" },
+			new BloodType { Id = 3, Name = "B+" },
+			new BloodType { Id = 4, Name = "B-" },
+			new BloodType { Id = 5, Name = "AB+" },
+			new BloodType { Id = 6, Name = "AB-" },
+			new BloodType { Id = 7, Name = "O+" },
+			new BloodType { Id = 8, Name = "O-" }
+	);
+
 		var superAdminRole = new Role { Id = 1, Name = "SuperAdmin" };
-		
+
 		modelBuilder.Entity<User>().HasData(
 				new User
 				{
@@ -84,20 +95,14 @@ public class ApplicationDbContext : DbContext
 					Phone = "98150999900",
 					RoleId = superAdminRole.Id,
 					Password = "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q" ,
+					BloodTypeId = 1,
+					
+
 				}
 		);
 
-		// Seeding Blood Types
-		modelBuilder.Entity<BloodType>().HasData(
-				new BloodType { Id = 1, Name = "A+" },
-				new BloodType { Id = 2, Name = "A-" },
-				new BloodType { Id = 3, Name = "B+" },
-				new BloodType { Id = 4, Name = "B-" },
-				new BloodType { Id = 5, Name = "AB+" },
-				new BloodType { Id = 6, Name = "AB-" },
-				new BloodType { Id = 7, Name = "O+" },
-				new BloodType { Id = 8, Name = "O-" }
-		);
+	
+	
 
 		modelBuilder.Entity<User>()
 				.HasIndex(u => u.Email)

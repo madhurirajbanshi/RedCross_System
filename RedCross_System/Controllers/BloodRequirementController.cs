@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
 using RedCross_System.Models.Domain;
@@ -13,7 +14,7 @@ namespace RedCross_System.Controllers
 		{
 			_context = context;
 		}
-	
+
 		public IActionResult Add()
 		{
 			return View();
@@ -25,31 +26,36 @@ namespace RedCross_System.Controllers
 		{
 			if (ModelState.IsValid)
 			{
-				if (model.Document != null && model.Document.Length > 0)
+				string base64Document = null;
+
+				if (model.File != null && model.File.Length > 0)
 				{
 					using (var memoryStream = new MemoryStream())
 					{
-						await model.Document.CopyToAsync(memoryStream);
+						await model.File.CopyToAsync(memoryStream);
 						byte[] fileBytes = memoryStream.ToArray();
-
-						var bloodRequirement = new BloodRequirement
-						{
-							Name = model.Name,
-							Purpose = model.Purpose,
-							Quantity = model.Quantity,
-							CreatedDate = model.CreatedDate,
-							Status = model.Status,
-							Document = fileBytes 
-						};
-
-						_context.BloodRequirements.Add(bloodRequirement);
-						await _context.SaveChangesAsync();
-
-						return RedirectToAction(nameof(Index)); 
+						base64Document = Convert.ToBase64String(fileBytes);
 					}
 				}
+
+				var bloodRequirement = new BloodRequirement
+				{
+					Name = model.Name,
+					Purpose = model.Purpose,
+					Quantity = model.Quantity,
+					CreatedDate = model.CreatedDate,
+					Status = model.Status,
+					Document = base64Document
+				};
+
+				_context.BloodRequirements.Add(bloodRequirement);
+				await _context.SaveChangesAsync();
+
+				return RedirectToAction(nameof(Index));
 			}
+
 			return View(model);
+
 		}
 
 		[HttpPost]
@@ -77,7 +83,9 @@ namespace RedCross_System.Controllers
 				Quantity = br.Quantity,
 				CreatedDate = br.CreatedDate,
 				Status = br.Status,
-				Document = br.Document != null ? $"data:image/png;base64,{Convert.ToBase64String(br.Document)}" : null
+				Document = !string.IsNullOrEmpty(br.Document)
+									 ? $"data:application/octet-stream;base64,{br.Document}"
+									 : null
 			}).ToList();
 
 
@@ -100,7 +108,7 @@ namespace RedCross_System.Controllers
 				Quantity = bloodRequirement.Quantity,
 				CreatedDate = bloodRequirement.CreatedDate,
 				Status = bloodRequirement.Status,
-				Document = null
+				Document = bloodRequirement.Document
 			};
 
 			return View(viewModel);
@@ -118,21 +126,23 @@ namespace RedCross_System.Controllers
 					return NotFound();
 				}
 
+				string base64Document = bloodRequirement.Document; 
+				if (model.File != null && model.File.Length > 0)
+				{
+					using (var memoryStream = new MemoryStream())
+					{
+						await model.File.CopyToAsync(memoryStream);
+						byte[] fileBytes = memoryStream.ToArray();
+						base64Document = Convert.ToBase64String(fileBytes);
+					}
+				}
+
 				bloodRequirement.Name = model.Name;
 				bloodRequirement.Purpose = model.Purpose;
 				bloodRequirement.Quantity = model.Quantity;
 				bloodRequirement.CreatedDate = model.CreatedDate;
 				bloodRequirement.Status = model.Status;
-
-				if (model.Document != null && model.Document.Length > 0)
-				{
-					using (var memoryStream = new MemoryStream())
-					{
-						await model.Document.CopyToAsync(memoryStream);
-						byte[] fileBytes = memoryStream.ToArray();
-						bloodRequirement.Document = fileBytes;
-					}
-				}
+				bloodRequirement.Document = base64Document;
 
 				_context.BloodRequirements.Update(bloodRequirement);
 				await _context.SaveChangesAsync();
@@ -143,8 +153,6 @@ namespace RedCross_System.Controllers
 			return View(model);
 		}
 
-	
-
-
+		
 	}
 }

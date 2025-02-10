@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RedCross_System.Data;
@@ -11,16 +12,43 @@ using RedCross_System.Data;
 namespace RedCross_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250124061452_Initial migration")]
-    partial class Initialmigration
+    [Migration("20250209062849_initital migration")]
+    partial class inititalmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("RedCrossSystem.Core.src.ProvinceFeature.ProvinceOfficeEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProvinceOfficeEntities", (string)null);
+                });
 
             modelBuilder.Entity("RedCross_System.Models.Domain.BloodIssue", b =>
                 {
@@ -28,17 +56,19 @@ namespace RedCross_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("BloodRequirementId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Charge")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("Discount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<int>("DonationId")
                         .HasColumnType("int");
@@ -55,7 +85,7 @@ namespace RedCross_System.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("Total")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
@@ -74,12 +104,14 @@ namespace RedCross_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<byte[]>("Document")
+                    b.Property<string>("Document")
                         .IsRequired()
-                        .HasColumnType("longblob");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -90,7 +122,7 @@ namespace RedCross_System.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -106,6 +138,8 @@ namespace RedCross_System.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -164,6 +198,8 @@ namespace RedCross_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("BranchId"));
+
                     b.Property<string>("BranchName")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -205,6 +241,8 @@ namespace RedCross_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -221,12 +259,18 @@ namespace RedCross_System.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time(6)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time(6)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -246,6 +290,8 @@ namespace RedCross_System.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -268,6 +314,8 @@ namespace RedCross_System.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BagNumber")
                         .IsRequired()
@@ -295,7 +343,7 @@ namespace RedCross_System.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -319,6 +367,8 @@ namespace RedCross_System.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BloodTypeId")
                         .HasColumnType("int");
@@ -345,9 +395,12 @@ namespace RedCross_System.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<byte[]>("Photo")
+                    b.Property<string>("Photo")
                         .IsRequired()
-                        .HasColumnType("longblob");
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("SecondaryNumber")
                         .IsRequired()
@@ -375,6 +428,8 @@ namespace RedCross_System.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CountryId")
                         .HasColumnType("int");
@@ -440,6 +495,8 @@ namespace RedCross_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -482,6 +539,8 @@ namespace RedCross_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
@@ -495,7 +554,7 @@ namespace RedCross_System.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -522,6 +581,11 @@ namespace RedCross_System.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BloodTypeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
@@ -543,6 +607,8 @@ namespace RedCross_System.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BloodTypeId");
+
                     b.HasIndex("Email")
                         .IsUnique();
 
@@ -554,6 +620,7 @@ namespace RedCross_System.Migrations
                         new
                         {
                             Id = 1,
+                            BloodTypeId = 1,
                             Email = "admin@gmail.com",
                             Name = "Madhuri",
                             Password = "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q",
@@ -648,7 +715,7 @@ namespace RedCross_System.Migrations
                         .HasForeignKey("CampaignId");
 
                     b.HasOne("RedCross_System.Models.Domain.User", "CreatedBy")
-                        .WithMany()
+                        .WithMany("Donations")
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -727,13 +794,26 @@ namespace RedCross_System.Migrations
 
             modelBuilder.Entity("RedCross_System.Models.Domain.User", b =>
                 {
+                    b.HasOne("RedCross_System.Models.Domain.BloodType", "BloodType")
+                        .WithMany()
+                        .HasForeignKey("BloodTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RedCross_System.Models.Domain.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("BloodType");
+
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("RedCross_System.Models.Domain.User", b =>
+                {
+                    b.Navigation("Donations");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
@@ -32,6 +33,7 @@ namespace RedCross_System.Controllers
 						Address = x.Address,
 						StartDate = x.StartDate,
 						EndDate = x.EndDate,
+
 						CreatedDate = x.CreatedDate,
 						CreatedBy = x.CreatedBy.Name,
 						Branch = x.Branch.BranchName,
@@ -152,7 +154,6 @@ namespace RedCross_System.Controllers
 				StartDate = campaign.StartDate.ToUniversalTime(),
 				EndDate = campaign.EndDate.ToUniversalTime(),
 				CreatedDate = campaign.CreatedDate.ToUniversalTime(),
-				CreatedBy = campaign.CreatedBy?.Name??"Unknown",
 				Branch = campaign.Branch?.BranchId.ToString(),
 				Branches = branches,
 				Status = campaign.Status

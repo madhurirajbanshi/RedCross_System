@@ -16,9 +16,10 @@
 			<input type="text" class="form-control" asp-for="Purpose" />
 		</div>
 
-		<div class="mb-2">
-			<label for="document" class="form-label">Upload Document</label>
-			<input type="file" class="form-control"  asp-for="Document" />
+		<div class="form-group">
+			<label for="File">Upload Document</label>
+			<input asp-for="File" class="form-control" type="file" />
+			<span asp-validation-for="File" class="text-danger"></span>
 		</div>
 
 		<div class="text-center">

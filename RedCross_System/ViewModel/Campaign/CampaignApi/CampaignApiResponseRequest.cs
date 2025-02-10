@@ -7,7 +7,8 @@
 		public string Address { get; set; }
 		public DateTime StartDate { get; set; } = DateTime.UtcNow;
 		public DateTime EndDate { get; set; } = DateTime.UtcNow;
-
+		public TimeSpan StartTime { get; set; }
+		public TimeSpan EndTime { get; set; }
 		public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 		public String Status { get; set; }
 

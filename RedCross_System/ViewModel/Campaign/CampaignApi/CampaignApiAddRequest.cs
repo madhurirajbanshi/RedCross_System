@@ -11,7 +11,8 @@ namespace RedCross_System.ViewModel.Campaign.CampaignApi
 
 		public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 		public String Status { get; set; } 
-
+		public TimeSpan StartTime { get; set; }
+		public TimeSpan EndTime { get; set; }
 		public string Branch { get; set; }
 	}
 }

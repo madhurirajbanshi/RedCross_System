@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
@@ -24,9 +25,16 @@ public class RegisterController : Controller
 			Text = r.Name
 		}).ToList();
 
+		var bloodtypes = _context.BloodTypes.Select(r => new SelectListItem
+		{
+			Value = r.Id.ToString(),
+			Text = r.Name
+		}).ToList();
+
 		var model = new RegisterViewModel
 		{
-			Roles = roles
+			Roles = roles,
+			BloodTypes=bloodtypes
 		};
 
 		return View(model);
@@ -53,8 +61,10 @@ public class RegisterController : Controller
 				return View(model);
 			}
 
-			var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == model.RoleId); 
-			if (role == null)
+			var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == model.RoleId);
+			var bloodtype = await _context.BloodTypes.FirstOrDefaultAsync(r => r.Id == model.BloodTypeId);
+
+			if (role == null|| bloodtype==null)
 			{
 				ModelState.AddModelError("", "Invalid Role selected.");
 				return View(model);
@@ -68,7 +78,8 @@ public class RegisterController : Controller
 				Password = hashedPassword,
 				Email = model.Email,
 				Phone = model.Phone,
-				RoleId = model.RoleId  
+				RoleId = model.RoleId,
+				BloodTypeId = model.BloodTypeId
 			};
 
 			_context.Users.Add(newUser);

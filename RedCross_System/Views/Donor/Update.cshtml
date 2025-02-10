@@ -34,11 +34,12 @@
       <input type="text" class="form-control" asp-for="SecondaryNumber" />
     </div>
 
-    <div class="mb-2">
-      <label for="Photo" class="form-label">Photo</label>
-      <input type="file" class="form-control" asp-for="Photo" />
+ 
+    <div class="form-group">
+      <label for="File">Upload New Photo (Optional)</label>
+      <input asp-for="File" class="form-control" type="file" />
+      <span asp-validation-for="File" class="text-danger"></span>
     </div>
-
     <div class="mb-2">
       <label for="BloodType" class="form-label">Blood Type</label>
       <select class="form-control" asp-for="BloodType" asp-items="@Model.BloodTypes">

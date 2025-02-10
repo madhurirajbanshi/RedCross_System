@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
@@ -7,7 +8,6 @@ using RedCross_System.Models.Domain;
 using RedCross_System.ViewModel.Branch;
 
 namespace RedCross_System.Controllers;
-
 public class BranchController : Controller
 {
 	private readonly ApplicationDbContext _context;
@@ -54,7 +54,6 @@ public class BranchController : Controller
 
 		return RedirectToAction("Index");
 	}
-
 
 
 	[HttpGet]
@@ -242,9 +241,5 @@ public class BranchController : Controller
 
 
 }
-
-
-
-
 
 

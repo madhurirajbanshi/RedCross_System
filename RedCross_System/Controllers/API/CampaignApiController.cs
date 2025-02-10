@@ -6,11 +6,13 @@ using RedCross_System.Helpers;
 using RedCross_System.Models.Domain;
 using RedCross_System.ViewModel.Campaign.CampaignApi;
 using RedCross_System.ViewModel.Campaign;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RedCross_System.Controllers.API
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class CampaignApiController : ControllerBase
 	{
 		private readonly ApplicationDbContext _applicationDbContext;
@@ -23,11 +25,11 @@ namespace RedCross_System.Controllers.API
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<CampaignIndexViewModel>>> GetAllCampaigns()
+		public async Task<ActionResult<IEnumerable<CampaignApiIndex>>> GetAllCampaigns()
 		{
 			var campaigns = await _applicationDbContext.Campaigns
 				      .Include(c=>c.Branch)
-					.Select(c => new CampaignIndexViewModel
+					.Select(c => new CampaignApiIndex
 					{
 						Id = c.Id,
 						Name = c.Name,
@@ -35,6 +37,8 @@ namespace RedCross_System.Controllers.API
 						Status = c.Status,
 						StartDate = c.StartDate,
 						EndDate = c.EndDate,
+						StartTime=c.StartTime,
+						EndTime=c.EndTime,
 						CreatedDate = c.CreatedDate,
 						Branch = c.Branch != null ? c.Branch.BranchName : "No Branch"
 					})
@@ -44,7 +48,7 @@ namespace RedCross_System.Controllers.API
 		}
 
 		[HttpGet("{id}")]
-		public async Task<ActionResult<CampaignIndexViewModel>> GetCampaign(int id)
+		public async Task<ActionResult<CampaignApiIndex>> GetCampaign(int id)
 		{
 			var campaign = await _applicationDbContext.Campaigns
 				  .Include(c=>c.Branch)
@@ -55,7 +59,7 @@ namespace RedCross_System.Controllers.API
 				return NotFound(new { message = $"Campaign with Id {id} not found." });
 			}
 
-			var viewModel = new CampaignIndexViewModel
+			var viewModel = new CampaignApiIndex
 			{
 				Id = campaign.Id,
 				Name = campaign.Name,
@@ -63,6 +67,8 @@ namespace RedCross_System.Controllers.API
 				Status = campaign.Status,
 				StartDate = campaign.StartDate,
 				EndDate = campaign.EndDate,
+				StartTime=campaign.StartTime,
+				EndTime=campaign.EndTime,
 				CreatedDate = campaign.CreatedDate,
 				Branch = campaign.Branch != null ? campaign.Branch.BranchName : "No Branch"
 			};
@@ -99,6 +105,9 @@ namespace RedCross_System.Controllers.API
 					Address = request.Address,
 					StartDate = request.StartDate,
 					EndDate = request.EndDate,
+					StartTime=request.StartTime,
+					EndTime=request.EndTime,
+
 					CreatedDate = DateTime.UtcNow,
 					Status = request.Status,
 					CreatedBy = currentUser,
@@ -120,6 +129,8 @@ namespace RedCross_System.Controllers.API
 					Status = savedCampaign.Status,
 					StartDate = savedCampaign.StartDate,
 					EndDate = savedCampaign.EndDate,
+					StartTime = savedCampaign.StartTime,
+					EndTime = savedCampaign.EndTime,
 					CreatedDate = savedCampaign.CreatedDate,
 					Branch = savedCampaign.Branch != null ? savedCampaign.Branch.BranchName : "No Branch",  
 
@@ -163,7 +174,8 @@ namespace RedCross_System.Controllers.API
 				campaign.EndDate = request.EndDate;
 				campaign.Status = request.Status;
 				campaign.CreatedDate = DateTime.UtcNow;
-				
+				campaign.StartTime = request.StartTime;
+				campaign.EndTime = request.EndTime;
 
 				_applicationDbContext.Campaigns.Update(campaign);
 				await _applicationDbContext.SaveChangesAsync();
@@ -176,6 +188,8 @@ namespace RedCross_System.Controllers.API
 					Status = campaign.Status,
 					StartDate = campaign.StartDate,
 					EndDate = campaign.EndDate,
+					StartTime=campaign.StartTime,
+					EndTime=campaign.EndTime,
 					CreatedDate = campaign.CreatedDate,
 					Branch = campaign.Branch != null ? campaign.Branch.BranchName : "No Branch" 
 				};

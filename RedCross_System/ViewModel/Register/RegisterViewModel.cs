@@ -32,5 +32,9 @@ namespace RedCross_System.ViewModel.Register
 		public string Phone { get; set; }
 		public List<SelectListItem>? Roles { get; set; }
 		public int RoleId { get; set; }
+
+		public List<SelectListItem>? BloodTypes { get; set; }
+		public int BloodTypeId { get; set; }
+
 	}
 }

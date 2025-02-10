@@ -24,5 +24,8 @@ namespace RedCross_System.ViewModel.User
 		public List<SelectListItem>? Roles { get; set; }
 		public string Role { get; set; }
 
+		public List<SelectListItem>? BloodTypes { get; set; }
+		public string BloodType { get; set; }
+
 	}
 }

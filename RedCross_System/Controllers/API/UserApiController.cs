@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
@@ -11,6 +12,7 @@ namespace RedCross_System.Controllers.API
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class UserApiController : ControllerBase
 	{
 		private readonly ApplicationDbContext _context;
@@ -22,34 +24,55 @@ namespace RedCross_System.Controllers.API
 			_sessionHelper = sessionHelper;
 		}
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<UserIndexViewModel>>> GetAllUsers()
+		public async Task<ActionResult<IEnumerable<UserIndexApi>>> GetAllUsers()
 		{
 			var users = await _context.Users
-					.Include(u => u.Role)
-					.Select(u => new UserIndexViewModel
-					{
-						Id = u.Id,
-						Name = u.Name,
-						Email = u.Email,
-						Role = u.Role != null ? u.Role.Name : "Unknown"
-					})
-					.ToListAsync();
+							.Include(u => u.Role)
+							.Include(u => u.BloodType)
+							.Include(u => u.Donations) 
+							.Select(u => new UserIndexApi
+							{
+								Id = u.Id,
+								Name = u.Name,
+								Email = u.Email,
+								Role = u.Role != null ? u.Role.Name : "Unknown",
+								RoleId = u.Role != null ? u.RoleId.ToString() : "0",
+								BloodType = u.BloodType != null ? u.BloodType.Name : "Unknown",
+								BloodTypeId = u.BloodType != null ? u.BloodTypeId.ToString() : "0",
+					     Quantity=u.TotalAmount,
+								DonationCount = u.Donations.Count,
+								LastDonationDate = u.Donations.Count > 0
+								? u.Donations.OrderByDescending(d => d.DonationDate).FirstOrDefault().DonationDate
+								: DateTime.MinValue
+							})
+							.ToListAsync();
 
 			return Ok(users);
 		}
 
 		[HttpGet("{id}")]
-		public async Task<ActionResult<UserIndexViewModel>> GetUserById(int id)
+		public async Task<ActionResult<UserIndexApi>> GetUserById(int id)
 		{
 			var user = await _context.Users
 					.Include(u => u.Role)
+					.Include(u=>u.BloodType)
+					.Include(u=>u.Donations)
 					.Where(u => u.Id == id)
-					.Select(u => new UserIndexViewModel
+					.Select(u => new UserIndexApi
 					{
 						Id = u.Id,
 						Name = u.Name,
 						Email = u.Email,
-						Role = u.Role != null ? u.Role.Name : "Unknown"
+						Role = u.Role != null ? u.Role.Name : "Unknown",
+						RoleId = u.Role != null ? u.RoleId.ToString() : "0",
+						BloodType = u.BloodType != null ? u.BloodType.Name : "Unknown",
+						BloodTypeId = u.BloodType != null ? u.BloodTypeId.ToString() : "0",
+					 Quantity=u.TotalAmount,
+						DonationCount = u.Donations.Count,
+						LastDonationDate = u.Donations.Count > 0
+								? u.Donations.OrderByDescending(d => d.DonationDate).FirstOrDefault().DonationDate
+								: DateTime.MinValue
+
 					})
 					.FirstOrDefaultAsync();
 
@@ -79,6 +102,14 @@ namespace RedCross_System.Controllers.API
 					return BadRequest(new { Message = $"Role '{request.Role}' not found." });
 				}
 
+				var bloodType = await _context.BloodTypes
+					 .FirstOrDefaultAsync(bt => bt.Name == request.BloodType);
+
+				if (bloodType == null)
+				{
+					return BadRequest(new { Message = $"Blood type '{request.BloodType}' not found." });
+				}
+
 				if (await _context.Users.AnyAsync(u => u.Email == request.Email))
 				{
 					return BadRequest(new { Message = "Email already registered." });
@@ -91,6 +122,8 @@ namespace RedCross_System.Controllers.API
 					Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
 					Phone = request.Phone,
 					RoleId = role.Id,
+					BloodTypeId=bloodType.Id,
+				
 				};
 
 				_context.Users.Add(user);
@@ -103,6 +136,7 @@ namespace RedCross_System.Controllers.API
 					Email = user.Email,
 					Role = role.Name,
 					Phone = user.Phone,
+					BloodType=bloodType.Name,
 				};
 
 				return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, response);
@@ -126,6 +160,7 @@ namespace RedCross_System.Controllers.API
 			{
 				var user = await _context.Users
 						.Include(u => u.Role)
+						.Include(u=>u.BloodType)
 						.FirstOrDefaultAsync(u => u.Id == id);
 
 				if (user == null)
@@ -151,6 +186,15 @@ namespace RedCross_System.Controllers.API
 					}
 					user.RoleId = newRole.Id;
 				}
+				if (!string.IsNullOrEmpty(request.BloodType))
+				{
+					var newbloodtype = await _context.BloodTypes.FirstOrDefaultAsync(r => r.Name == request.BloodType);
+					if (newbloodtype == null)
+					{
+						return BadRequest(new { Message = $"BloodType '{request.BloodType}' not found." });
+					}
+					user.BloodTypeId = newbloodtype.Id;
+				}
 
 				if (!string.IsNullOrEmpty(request.Name))
 					user.Name = request.Name;
@@ -166,6 +210,7 @@ namespace RedCross_System.Controllers.API
 					Name = user.Name,
 					Email = user.Email,
 					Role = user.Role.Name,
+					BloodType=user.BloodType.Name,
 					Phone = user.Phone
 				};
 

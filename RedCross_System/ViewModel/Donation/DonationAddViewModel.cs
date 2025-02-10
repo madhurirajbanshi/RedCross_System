@@ -11,9 +11,8 @@ namespace RedCross_System.ViewModel.Donation
 
 		public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-		[Required]
+		//[Required]
 		public string Status { get; set; } = "active";
-
 		public List<SelectListItem>? Donors { get; set; }
 		[Required]
 		public string Donor { get; set; }
@@ -34,5 +33,7 @@ namespace RedCross_System.ViewModel.Donation
 		[Required]
 		[StringLength(50, ErrorMessage = "Bag number can't be longer than 50 characters.")]
 		public string BagNumber { get; set; }
+
+		public DateTime? ScheduledDate { get; set; }
 	}
 }

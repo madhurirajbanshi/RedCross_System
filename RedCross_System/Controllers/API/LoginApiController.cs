@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RedCross_System.Models.Domain;
-using RedCross_System.ViewModel.Login;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
-using System.Threading.Tasks;
+using RedCross_System.Models.Domain;
+using RedCross_System.Services;
 using RedCross_System.Data;
-using RedCross_System.Helpers;
+using RedCross_System.ViewModel.Login;
 
 namespace RedCross_System.Controllers.Api
 {
@@ -16,12 +15,12 @@ namespace RedCross_System.Controllers.Api
 	public class LoginApiController : ControllerBase
 	{
 		private readonly ApplicationDbContext _context;
-		private readonly SessionHelper _sessionHelper;
+		private readonly JwtService _jwtService;
 
-		public LoginApiController(ApplicationDbContext context, SessionHelper sessionHelper)
+		public LoginApiController(ApplicationDbContext context, JwtService jwtService)
 		{
 			_context = context;
-			_sessionHelper = sessionHelper;
+			_jwtService = jwtService;
 		}
 
 		[HttpPost("login")]
@@ -41,54 +40,15 @@ namespace RedCross_System.Controllers.Api
 				return Unauthorized(new { message = "Invalid username or password." });
 			}
 
-			if (user.Role == null)
-			{
-				return BadRequest(new { message = "User role is not defined." });
-			}
-
-			var claims = new List<Claim>
-						{
-								new Claim(ClaimTypes.Name, user.Name),
-								new Claim(ClaimTypes.Role, user.Role.Name)
-						};
-
-			var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-			var principal = new ClaimsPrincipal(identity);
-
-			await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+			// Generate JWT Token
+			var token = _jwtService.GenerateJwtToken(user);
 
 			return Ok(new
 			{
 				message = "Login successful",
-				role = user.Role.Name
+				token = token,
+				UserId=user.Id // Return token to the client
 			});
-		}
-
-		[HttpPost("logout")]
-		public async Task<IActionResult> Logout()
-		{
-			await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-			return Ok(new { message = "Logout successful." });
-		}
-
-		[HttpGet("status")]
-		public IActionResult GetLoginStatus()
-		{
-			var user = HttpContext.User;
-			if (user.Identity.IsAuthenticated)
-			{
-				var userName = user.Identity.Name;
-				var userRole = user.FindFirst(ClaimTypes.Role)?.Value;
-
-				return Ok(new
-				{
-					message = "User is logged in",
-					userName = userName,
-					role = userRole
-				});
-			}
-
-			return Unauthorized(new { message = "User is not logged in" });
 		}
 	}
 }
