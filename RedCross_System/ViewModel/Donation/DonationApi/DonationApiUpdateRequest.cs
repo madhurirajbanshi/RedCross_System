@@ -6,7 +6,7 @@
 		public decimal Quantity { get; set; }
 		public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 		public string CreatedBy { get; set; }
-		public string Status { get; set; } = "active";
+		public string Status { get; set; }
 		public string Donor { get; set; }
 		public string Branch { get; set; }
 		public string Campaign { get; set; }

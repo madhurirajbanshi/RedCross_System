@@ -8,41 +8,144 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using RedCross_System.Service;
 using RedCross_System.Models.Domain;
+using RedCrossSystem.Core.src.ProvinceFeature;
+using Serilog;
+using Microsoft.AspNetCore.Authorization;
+using RedCross_System.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using RedCross_System.Services;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Mvc.Authorization;
+
+// TLS config
+using System.Net;
+using System.Security.Authentication;
+using System.Net.Security;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Kestrel to use TLS 1.2 and TLS 1.3
+builder.WebHost.ConfigureKestrel(options =>
+{
+	options.ConfigureHttpsDefaults(httpsOptions =>
+	{
+		httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13;
+	});
+});
+
+// Ensure proper certificate validation (for production)
+// Only for development purposes, validate self-signed certificates
+ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
+{
+	if (sslPolicyErrors == SslPolicyErrors.None)
+	{
+		return true; // If no errors, the certificate is valid
+	}
+	else
+	{
+		// Log the SSL errors for better tracking and debugging
+		Log.Error($"SSL Certificate error: {sslPolicyErrors}");
+		return false; // Reject the certificate if errors are found
+	}
+};
+
+// Configure Serilog for logging
+Log.Logger = new LoggerConfiguration()
+		.MinimumLevel.Debug()
+		.WriteTo.File("Logs/redcross_logs.txt", rollingInterval: RollingInterval.Day) // Set log file path with daily rolling
+		.CreateLogger();
+
+builder.Host.UseSerilog();
+
+// Set Excel Package License
 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-// Add services to the container.
+
+// Add services to the container
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 
 // Add session helper to service
 builder.Services.AddScoped<SessionHelper>();
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-	options.UseMySQL(builder.Configuration.GetConnectionString("MysqlConnection"));
-});
-
-
-// Configure authentication using cookies
+builder.Services.AddScoped<ProvinceService>();
+builder.Services.AddDistributedMemoryCache(); // Required for session storage
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 		.AddCookie(options =>
 		{
-			options.LoginPath = "/Login/Index";  // Redirect to login if not authenticated
-			options.LogoutPath = "/Login/Logout"; // Redirect to logout path
-			options.ExpireTimeSpan = TimeSpan.FromHours(24);  // Set cookie expiration time
-			options.SlidingExpiration = true;  // Enable sliding expiration
-			options.Cookie.HttpOnly = true;  // Ensure the session cookie is only accessible via HTTP requests
-			options.Cookie.IsEssential = true;  // Cookie essential for authentication
+			options.LoginPath = "/Login/Index";  // Path to redirect if not authenticated
+			options.LogoutPath = "/Login/Logout"; // Path to logout
+			options.SlidingExpiration = true;    // Enable sliding expiration for cookies
+			options.ExpireTimeSpan = TimeSpan.FromHours(1);  // Set expiration time
 		});
 
-// Session configuration for storing session data (e.g., username)
-builder.Services.AddDistributedMemoryCache();  // Store session in memory
 builder.Services.AddSession(options =>
 {
-	options.IdleTimeout = TimeSpan.FromMinutes(30);  // Session timeout duration
-	options.Cookie.HttpOnly = true;  // Prevent JavaScript from accessing session cookies
-	options.Cookie.IsEssential = true;  // Ensure session cookie is always sent
+	options.Cookie.HttpOnly = true;
+	options.Cookie.IsEssential = true;
+	options.IdleTimeout = TimeSpan.FromMinutes(30);  // Set session timeout duration
+});
+
+builder.Services.AddScoped<JwtService>();
+
+builder.Services.AddSwaggerGen(c =>
+{
+	c.SwaggerDoc("v1", new OpenApiInfo
+	{
+		Title = "RedCross API",
+		Version = "v1",
+		Description = "API documentation for the Red Cross Blood Management System"
+	});
+
+	// Configure JWT Authentication for Swagger
+	c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+	{
+		Name = "Authorization",
+		Type = SecuritySchemeType.Http,
+		Scheme = "Bearer",
+		BearerFormat = "JWT",
+		In = ParameterLocation.Header,
+		Description = "Enter 'Bearer' [space] and your valid token.\n\nExample: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'"
+	});
+
+	c.AddSecurityRequirement(new OpenApiSecurityRequirement
+		{
+				{
+						new OpenApiSecurityScheme
+						{
+								Reference = new OpenApiReference
+								{
+										Type = ReferenceType.SecurityScheme,
+										Id = "Bearer"
+								}
+						},
+						new string[] { }
+				}
+		});
+});
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+{
+	options.UseMySql(builder.Configuration.GetConnectionString("MysqlConnection"),MySqlServerVersion.AutoDetect(builder.Configuration.GetConnectionString("MysqlConnection")));
+});
+
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+	options.TokenValidationParameters = new TokenValidationParameters
+	{
+		ValidateIssuer = true,
+		ValidateAudience = true,
+		ValidateLifetime = true,
+		ValidateIssuerSigningKey = true,
+		ValidIssuer = builder.Configuration["Jwt:Issuer"],  // The issuer from configuration
+		ValidAudience = builder.Configuration["Jwt:Audience"],  // The audience from configuration
+		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))  // Your secret key
+	};
 });
 
 // Add the EmailSender service
@@ -50,36 +153,51 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-	app.UseExceptionHandler("/Home/Error");  // Error handling page
-	app.UseHsts();  // HTTP Strict Transport Security
-}
+// Enable session support
+app.UseSession();
 
-app.UseSession();  // Enable session middleware
-app.UseHttpsRedirection();  // Redirect HTTP requests to HTTPS
-app.UseStaticFiles();  // Serve static files (CSS, JS, images)
+// Force HTTPS
+app.UseHttpsRedirection();
 
-app.UseRouting();  // Set up routing middleware
+// Serve static files (CSS, JS, images)
+app.UseStaticFiles();
 
-app.UseAuthentication();  // Enable authentication middleware
-app.UseAuthorization();  // Enable authorization middleware
+// Set up routing middleware
+app.UseRouting();
 
+// Use authentication middleware (this is required before authorization)
+app.UseAuthentication();
+
+// Use authorization middleware (this must be between UseRouting and UseEndpoints)
+app.UseAuthorization();
+
+// CORS configuration for all origins, methods, and headers
 app.UseCors(builder => builder
 		.AllowAnyOrigin()  // Allows requests from any domain
 		.AllowAnyMethod()  // Allows all HTTP methods (GET, POST, PUT, DELETE, etc.)
 		.AllowAnyHeader()  // Allows all request headers
 );
 
+// Swagger UI setup (only in development environment)
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();  // Generate Swagger documentation
-	app.UseSwaggerUI(c =>  // Serve the Swagger UI
+	app.UseSwaggerUI(c =>
 	{
 		c.SwaggerEndpoint("/swagger/v1/swagger.json", "RedCross API V1");
 		c.RoutePrefix = "swagger";  // Optional: Makes Swagger UI the default page
 	});
+}
+
+// Error handling setup based on environment
+if (app.Environment.IsDevelopment())
+{
+	app.UseStatusCodePagesWithReExecute("/Home/Error/{0}");  // Custom error handling for development
+}
+else
+{
+	app.UseExceptionHandler("/Home/Error");  // Error handling page for production
+	app.UseHsts();  // HTTP Strict Transport Security (for production)
 }
 
 // Set up the default route
@@ -87,4 +205,4 @@ app.MapControllerRoute(
 		name: "default",
 		pattern: "{controller=Login}/{action=Index}/{id?}");  // Default route is Login/Index
 
-	app.Run();  // Run the application
+app.Run();  // Run the application

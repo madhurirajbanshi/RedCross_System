@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace RedCross_System.ViewModel.BloodIssue
 {
@@ -7,6 +8,7 @@ namespace RedCross_System.ViewModel.BloodIssue
 		public int Id { get; set; }
 		public string ReceiverName { get; set; }
 		public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
 		public decimal Charge { get; set; }
 		public decimal Discount { get; set; }
 		public decimal Total { get; set; }

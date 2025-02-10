@@ -1,0 +1,138 @@
+﻿@model IEnumerable<RedCross_System.CoreModule.ProvinceOfficeFeature.ProvinceIndexDto>
+
+<div class="container mt-4">
+  <h1 class="text-left text-primary mb-4">Province Office</h1>
+  <div class="d-flex justify-content-start mb-3">
+    <a asp-action="Add" asp-controller="ProvinceOffice" class="btn btn-primary" style="text-decoration: none;">
+      <i class="fas fa-plus"></i> Add 
+    </a>
+  </div>
+
+  <div class="card card-primary">
+    <div class="card-header">
+      <h3 class="card-title">Province Office List</h3>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped">
+          <thead class="thead-light">
+            <tr>
+              <th>SN</th>
+              <th> Name</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @{
+              long sn = 1;
+              foreach (var provinceoffice in Model)
+              {
+                <tr>
+                  <td>@sn</td>
+                  <td>@provinceoffice.Name</td>
+                  <td>@provinceoffice.Description</td>
+                  <td>
+                    <span class="badge @(provinceoffice.Status == "Active" ? "bg-success" : "bg-danger")">
+                      @provinceoffice.Status
+                    </span>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2">
+                      <a asp-action="Update" asp-route-id="@provinceoffice.Id" class="btn btn-action btn-success">
+                        <i class="fas fa-edit"></i> Update
+                      </a>
+                      <form asp-action="ToggleStatus" asp-route-id="@provinceoffice.Id" method="post">
+                        <button type="submit" class="btn btn-status @(provinceoffice.Status == "Active" ? "btn-danger" : "btn-success")">
+                          @(provinceoffice.Status == "Active" ? "Deactivate" : "Activate")
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                sn++;
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include AdminLTE CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js"></script>
+
+<style>
+  /* Card Header Styling */
+  .card-header {
+    background-color: #003366;
+    color: white;
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  /* Flexbox for action buttons */
+  .d-flex {
+    display: flex;
+    gap: 6px; /* Reduced gap between buttons */
+  }
+
+  /* Fix Table Overflow */
+  .table-responsive {
+    overflow-x: auto; /* Enables horizontal scrolling for the table */
+    white-space: nowrap; /* Prevents content from wrapping */
+  }
+
+  /* Add spacing for the container */
+  .container {
+    padding-top: 20px;
+  }
+
+  /* Fix Row Alignment */
+  .table tbody tr td {
+    overflow: hidden; /* Ensures content stays inside cells */
+    text-overflow: ellipsis; /* Adds "..." for overflowing text */
+  }
+
+  /* Action Button Styling */
+  .btn-action {
+    font-size: 14px; /* Larger font size */
+    padding: 8px 16px; /* Larger padding for a bigger button */
+    text-align: center;
+  }
+
+  /* Button Success and Danger for Action Buttons */
+  .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+  }
+
+  .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+
+  .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+  }
+
+</style>

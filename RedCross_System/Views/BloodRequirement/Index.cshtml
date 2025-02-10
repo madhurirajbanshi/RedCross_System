@@ -41,7 +41,7 @@
                   <td>@bloodrequirement.Purpose</td>
                   <td>@bloodrequirement.Quantity</td>
                   <td>
-                    @if (!string.IsNullOrEmpty(bloodrequirement.Document))
+                    @if (!string.IsNullOrEmpty(@bloodrequirement.Document))
                     {
                       <img src="@bloodrequirement.Document" alt="Document" style="width: 100px; height: auto;" />
                     }

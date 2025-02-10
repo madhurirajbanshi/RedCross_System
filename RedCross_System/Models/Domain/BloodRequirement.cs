@@ -8,7 +8,7 @@
 		public decimal Quantity {  get; set; }
 		public DateTime CreatedDate { get; set; }= DateTime.UtcNow;
 		public string Status { get; set; } = "Active";
-		public byte[] Document { get; set; }
+		public string Document { get; set; }
 
 
 	}

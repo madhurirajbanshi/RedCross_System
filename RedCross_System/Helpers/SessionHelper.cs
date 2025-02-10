@@ -18,6 +18,11 @@ public class SessionHelper
 		_dbContext = dbContext;
 		_httpContextAccessor = httpContextAccessor;
 	}
+
+	public static class CustomClaimTypes
+	{
+		public const string BloodType = "bloodType"; // Custom claim type for blood type
+	}
 	public async Task SetSessionAsync(User user)
 	{
 		var httpContext = _httpContextAccessor.HttpContext;
@@ -25,12 +30,14 @@ public class SessionHelper
 		httpContext.Session.SetString("Username", user.Name);
 		httpContext.Session.SetString("UserId", user.Id.ToString());
 		httpContext.Session.SetString("Role", user.Role.Name);
+		httpContext.Session.SetString("BloodType", user.BloodType.Name);
 
 		var claims = new List<Claim>
 		{
 				new Claim(ClaimTypes.Name, user.Name),
 				new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-				new Claim(ClaimTypes.Role, user.Role.Name)
+				new Claim(ClaimTypes.Role, user.Role.Name),
+				new Claim(CustomClaimTypes.BloodType,user.BloodType.Name)
 		};
 		var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 		var authProperties = new AuthenticationProperties
@@ -51,8 +58,10 @@ public class SessionHelper
 		var userId = httpContext.Session.GetString("UserId");
 		if (userId == null)
 			throw new Exception("Invalid Session");
-
-		var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == int.Parse(userId)) ?? throw new Exception("User Not Found");
+		var user = await _dbContext.Users
+								.Include(u => u.Role)
+								.Include(u => u.BloodType)
+								.FirstOrDefaultAsync(x => x.Id == int.Parse(userId)) ?? throw new Exception("User Not Found");
 		return user;
 	}
 

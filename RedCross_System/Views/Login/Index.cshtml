@@ -184,7 +184,7 @@
       <div class="login-title">Sign in to your account</div>
     </div>
 
-    <form asp-action="Index" method="post" class="login-form">
+    <form asp-controller="Login" asp-action="Index" method="post" class="login-form">
       @if (!ViewData.ModelState.IsValid || ViewData["Error"] != null)
       {
         <div class="alert-danger">

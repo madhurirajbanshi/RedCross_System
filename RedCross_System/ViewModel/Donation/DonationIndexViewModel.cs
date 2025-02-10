@@ -18,5 +18,7 @@ namespace RedCross_System.ViewModel.Donation
 		public DateTime DonationDate { get; set; } = DateTime.UtcNow;
 		public DateTime ExpiryDate { get;set; } = DateTime.UtcNow;
 		public string BagNumber {  get; set; }
+		public DateTime ?ScheduledDate { get; set; }
+		
 	}
 }

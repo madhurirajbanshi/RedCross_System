@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RedCross_System.Data;
 using RedCross_System.Helpers;
@@ -7,7 +8,7 @@ using RedCross_System.Models.Domain;
 
 namespace RedCross_System.Controllers
 {
-    public class HomeController : Controller
+	public class HomeController : Controller
     {
     private readonly ILogger<HomeController> _logger;
 		private readonly ApplicationDbContext _context;

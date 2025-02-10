@@ -17,18 +17,16 @@
           <p class="mb-1"><strong>Permanent Address:</strong> @Model.Donor.PermanentAddress</p>
           <p class="mb-1"><strong>Blood Type:</strong> @Model.Donor.BloodType?.Name</p>
         </div>
-        <div class="col-md-4 text-center">
-          @if (Model.Donor.Photo != null)
-          {
-            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Donor.Photo)"
-                 alt="Donor Photo"
-                 class="img-fluid rounded-circle shadow-sm"
-                 style="max-width: 120px;" />
-          }
-          else
-          {
-            <div class="text-muted" style="font-size: 0.9rem;">No Photo Available</div>
-          }
+          <div class="col-md-4 text-center">
+            @if (!string.IsNullOrEmpty(Model.Donor.Photo))
+            {
+              <img src="data:image/jpeg;base64,@Model.Donor.Photo" alt="Donor Photo" style="width: 100px; height: auto;" />
+            }
+            else
+            {
+              <div class="text-muted" style="font-size: 0.9rem;">No Photo Available</div>
+            }
+          </div>
         </div>
       </div>
     </div>

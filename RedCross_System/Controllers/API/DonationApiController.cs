@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
@@ -11,6 +12,7 @@ namespace RedCross_System.Controllers.API
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class DonationApiController : ControllerBase
 	{
 		
@@ -23,14 +25,14 @@ namespace RedCross_System.Controllers.API
 		}
 
 			[HttpGet]
-			public async Task<ActionResult<IEnumerable<DonationIndexViewModel>>> GetAllDonations()
+			public async Task<ActionResult<IEnumerable<DonationApiIndex>>> GetAllDonations()
 			{
 				var donations = await _applicationDbContext.Donations
 						.Include(d => d.Branch)
 						.Include(d => d.Campaign)
 						.Include(d => d.Donor)
 						.Include(x => x.CreatedBy)
-						.Select(d => new DonationIndexViewModel
+						.Select(d => new DonationApiIndex
 						{
 							Id = d.Id,
 							Quantity = d.Quantity,
@@ -42,7 +44,8 @@ namespace RedCross_System.Controllers.API
 							Campaign = d.Campaign != null ? d.Campaign.Name : "No Campaign",
 							DonationDate = d.DonationDate,
 							ExpiryDate = d.ExpiryDate,
-							BagNumber = d.BagNumber
+							BagNumber = d.BagNumber,
+							ScheduledDate=d.ScheduledDate
 						})
 						.ToListAsync();
 
@@ -50,7 +53,7 @@ namespace RedCross_System.Controllers.API
 			}
 
 		[HttpGet("{id}")]
-		public async Task<ActionResult<DonationIndexViewModel>> GetDonationById(int id)
+		public async Task<ActionResult<DonationApiIndex>> GetDonationById(int id)
 		{
 			var donation = await _applicationDbContext.Donations
 					.Include(d => d.Branch)
@@ -58,7 +61,7 @@ namespace RedCross_System.Controllers.API
 					.Include(d => d.Donor)
 					.Include(x => x.CreatedBy)
 					.Where(d => d.Id == id)
-					.Select(d => new DonationIndexViewModel
+					.Select(d => new DonationApiIndex
 					{
 						Id = d.Id,
 						Quantity = d.Quantity,
@@ -70,7 +73,8 @@ namespace RedCross_System.Controllers.API
 						Campaign = d.Campaign != null ? d.Campaign.Name : "No Campaign",
 						DonationDate = d.DonationDate,
 						ExpiryDate = d.ExpiryDate,
-						BagNumber = d.BagNumber
+						BagNumber = d.BagNumber,
+						ScheduledDate = d.ScheduledDate
 					})
 					.FirstOrDefaultAsync();
 

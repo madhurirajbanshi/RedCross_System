@@ -9,9 +9,11 @@ using RedCross_System.Helpers;
 using RedCross_System.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RedCross_System.Controllers
 {
+	[AllowAnonymous]
 	public class LoginController : Controller
 	{
 		private readonly ApplicationDbContext _context;
@@ -27,7 +29,6 @@ namespace RedCross_System.Controllers
 		{
 			return View();
 		}
-
 		[HttpPost]
 		public async Task<IActionResult> Index(IndexViewModel model)
 		{
@@ -35,6 +36,7 @@ namespace RedCross_System.Controllers
 			{
 				var user = await _context.Users
 						.Include(u => u.Role)
+						.Include(u=>u.BloodType)
 						.FirstOrDefaultAsync(u => u.Name == model.UserName);
 
 				if (user != null && BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
@@ -42,6 +44,12 @@ namespace RedCross_System.Controllers
 					if (user.Role == null)
 					{
 						ModelState.AddModelError("", "User role is not defined.");
+						return View(model);
+					}
+
+					if (user.BloodType == null)
+					{
+						ModelState.AddModelError("", "User blood type is not defined.");
 						return View(model);
 					}
 

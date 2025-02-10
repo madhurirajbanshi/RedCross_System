@@ -48,9 +48,9 @@
                   <td>@donor.SecondaryNumber</td>
                   <td>@donor.Email</td>
                   <td>
-                    @if (!string.IsNullOrEmpty(donor.PhotoBase64))
+                    @if (!string.IsNullOrEmpty(@donor.Photo))
                     {
-                      <img src="data:image/jpeg;base64,@donor.PhotoBase64" alt="Donor Photo" width="50" />
+                      <img src="@donor.Photo" alt="Document" style="width: 100px; height: auto;" />
                     }
                     else
                     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
@@ -14,6 +15,7 @@ namespace RedCross_System.Controllers.API
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class BranchApiController : ControllerBase
 	{
 		private readonly ApplicationDbContext _applicationDbContext;

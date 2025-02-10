@@ -7,6 +7,6 @@
 		public decimal Quantity { get; set; }
 		public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 		public string Status { get; set; } = "Active";
-		public IFormFile Document { get; set; }
+		public IFormFile File{ get; set; }
 	}
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
@@ -41,7 +42,8 @@ namespace RedCross_System.Controllers.API
 						CreatedBy = d.CreatedBy != null ? d.CreatedBy.Name : "Unknown",
 						CreatedDate = d.CreatedDate,
 						Status = d.Status,
-						BloodType = d.BloodType != null ? d.BloodType.Name : "Unknown"
+						BloodType = d.BloodType != null ? d.BloodType.Name : "Unknown",
+						BloodTypeId = d.BloodType != null ? d.BloodType.Id : 0
 					})
 					.ToListAsync();
 
@@ -64,11 +66,12 @@ namespace RedCross_System.Controllers.API
 						MobileNumber = d.MobileNumber,
 						SecondaryNumber = d.SecondaryNumber,
 						Email = d.Email,
-						PhotoBase64 = d.Photo != null ? Convert.ToBase64String(d.Photo) : null,
 						CreatedBy = d.CreatedBy != null ? d.CreatedBy.Name : "Unknown",
 						CreatedDate = d.CreatedDate,
 						Status = d.Status,
-						BloodType = d.BloodType != null ? d.BloodType.Name : "Unknown"
+						BloodType = d.BloodType != null ? d.BloodType.Name : "Unknown",
+						BloodTypeId = d.BloodType != null ? d.BloodType.Id : 0
+
 					})
 					.FirstOrDefaultAsync();
 

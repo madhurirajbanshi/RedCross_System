@@ -26,6 +26,9 @@
               <th>Campaign Name</th>
               <th>Quantity</th>
               <th>BagNumber</th>
+              <th>ScheduleDate</th>
+
+
               <th>Status</th>
               <th>Action</th>
             </tr>
@@ -42,6 +45,7 @@
                   <td>@donation.Campaign</td>
                   <td>@donation.Quantity</td>
                   <td>@donation.BagNumber</td>
+                  <td>@donation.ScheduledDate</td>
                   <td>
                     <span class="badge @(donation.Status == "Active" ? "bg-success" : "bg-danger")">
                       @donation.Status

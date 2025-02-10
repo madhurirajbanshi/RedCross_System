@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RedCross_System.Data;
@@ -61,6 +62,9 @@ namespace RedCross_System.Controllers
 		}
 
 
+
+
+
 		[HttpGet]
 		public async Task<IActionResult> Add()
 		{
@@ -83,12 +87,12 @@ namespace RedCross_System.Controllers
 			}).ToListAsync();
 
 			campaigns.Insert(0, new SelectListItem { Value = "", Text = "-- Select Campaign (Optional) --" });
-
+	
 			var viewModel = new DonationAddViewModel
 			{
 				Donors = donors,
 				Branches = branches,
-				Campaigns = campaigns
+				Campaigns = campaigns,
 			};
 
 			return View(viewModel);
@@ -171,7 +175,8 @@ namespace RedCross_System.Controllers
 				Campaign = campaign,
 				DonationDate = viewModel.DonationDate,
 				ExpiryDate = viewModel.ExpiryDate,
-				BagNumber = generatedBagNumber
+				BagNumber = generatedBagNumber,
+				ScheduledDate = viewModel.ScheduledDate
 			};
 
 			_context.Donations.Add(donation);

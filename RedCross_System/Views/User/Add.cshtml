@@ -33,6 +33,13 @@
       </select>
     </div>
 
+    <div class="mb-2">
+      <label for="Bloodtype" class="form-label">Select BloodType</label>
+      <select class="form-control" asp-for="BloodType" asp-items="@Model.BloodTypes">
+        <option value="">-- Select BloodType --</option>
+      </select>
+    </div>
+
     <div class="text-center">
       <button type="submit" class="btn btn-primary">Submit</button>
     </div>

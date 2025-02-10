@@ -13,7 +13,6 @@ using RedCross_System.Data;
 
 namespace RedCross_System.Controllers;
 
-[Authorize]
 public class DonorController : Controller
 {
 	private readonly ApplicationDbContext _context;
@@ -89,30 +88,36 @@ public class DonorController : Controller
 			return View(donorAddView);
 		}
 
-		byte[] photoBytes = null;
-		if (donorAddView.Photo != null && donorAddView.Photo.Length > 0)
+		string base64Photo = null;
+
+		if (donorAddView.File != null && donorAddView.File.Length > 0)
 		{
-			photoBytes = await ConvertIFormFileToByteArray(donorAddView.Photo);
+			using (var memoryStream = new MemoryStream())
+			{
+				await donorAddView.File.CopyToAsync(memoryStream);
+				byte[] fileBytes = memoryStream.ToArray();
+				base64Photo = Convert.ToBase64String(fileBytes);
+			}
+			var donor = new Donor
+			{
+				Name = donorAddView.Name,
+				TemporaryAddress = donorAddView.TemporaryAddress,
+				PermanentAddress = donorAddView.PermanentAddress,
+				MobileNumber = donorAddView.MobileNumber,
+				SecondaryNumber = donorAddView.SecondaryNumber,
+				Email = donorAddView.Email,
+				Photo = base64Photo,
+				CreatedBy = createdBy,
+				Status = donorAddView.Status,
+				BloodType = bloodType
+			};
+
+			_context.Donors.Add(donor);
+			await _context.SaveChangesAsync();
+
+			return RedirectToAction("Index");
 		}
-
-		var donor = new Donor
-		{
-			Name = donorAddView.Name,
-			TemporaryAddress = donorAddView.TemporaryAddress,
-			PermanentAddress = donorAddView.PermanentAddress,
-			MobileNumber = donorAddView.MobileNumber,
-			SecondaryNumber = donorAddView.SecondaryNumber,
-			Email = donorAddView.Email,
-			Photo = photoBytes,
-			CreatedBy = createdBy,
-			Status = donorAddView.Status,
-			BloodType = bloodType
-		};
-
-		_context.Donors.Add(donor);
-		await _context.SaveChangesAsync();
-
-		return RedirectToAction("Index");
+		return View(donorAddView);
 	}
 
 	[HttpGet]
@@ -133,7 +138,9 @@ public class DonorController : Controller
 			SecondaryNumber = x.SecondaryNumber,
 			Email = x.Email,
 			Status = x.Status,
-			PhotoBase64 = x.Photo != null ? Convert.ToBase64String(x.Photo) : null,
+			Photo = !string.IsNullOrEmpty(x.Photo)
+									 ? $"data:application/octet-stream;base64,{x.Photo}"
+									 : null,
 			BloodType = x.BloodType.Name,
 			CreatedBy = x.CreatedBy.Name
 		}).ToList();
@@ -168,7 +175,7 @@ public class DonorController : Controller
 			SecondaryNumber = donor.SecondaryNumber,
 			Email = donor.Email,
 			Status = donor.Status,
-			PhotoBase64 = donor.Photo != null ? Convert.ToBase64String(donor.Photo) : null,
+			Photo = donor.Photo,
 			BloodType = donor.BloodType.Id.ToString(),
 			BloodTypes = bloodTypeList
 		};
@@ -203,14 +210,16 @@ public class DonorController : Controller
 			ModelState.AddModelError("", "Invalid Blood Type selected.");
 			return View(donorUpdateView);
 		}
-
-		if (donorUpdateView.Photo != null && donorUpdateView.Photo.Length > 0)
+		string base64Photo =donor.Photo;
+		if (donorUpdateView.File != null && donorUpdateView.File.Length > 0)
 		{
-			using var memoryStream = new MemoryStream();
-			await donorUpdateView.Photo.CopyToAsync(memoryStream);
-			donor.Photo = memoryStream.ToArray();
+			using (var memoryStream = new MemoryStream())
+			{
+				await donorUpdateView.File.CopyToAsync(memoryStream);
+				byte[] fileBytes = memoryStream.ToArray();
+				base64Photo = Convert.ToBase64String(fileBytes);
+			}
 		}
-
 		donor.Name = donorUpdateView.Name;
 		donor.TemporaryAddress = donorUpdateView.TemporaryAddress;
 		donor.PermanentAddress = donorUpdateView.PermanentAddress;
@@ -219,7 +228,7 @@ public class DonorController : Controller
 		donor.Email = donorUpdateView.Email;
 		donor.Status = donorUpdateView.Status;
 		donor.BloodType = bloodType;
-
+		donor.Photo = base64Photo;
 		_context.Update(donor);
 		await _context.SaveChangesAsync();
 
