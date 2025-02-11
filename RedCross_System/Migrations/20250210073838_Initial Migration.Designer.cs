@@ -12,8 +12,8 @@ using RedCross_System.Data;
 namespace RedCross_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250209062849_initital migration")]
-    partial class inititalmigration
+    [Migration("20250210073838_Initial Migration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -344,6 +344,9 @@ namespace RedCross_System.Migrations
 
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime?>("ScheduledDate")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Status")
                         .IsRequired()

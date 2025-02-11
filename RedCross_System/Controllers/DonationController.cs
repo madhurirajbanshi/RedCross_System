@@ -166,7 +166,8 @@ namespace RedCross_System.Controllers
 			string generatedBagNumber = "BAG-"  + new Random().Next(1000, 9999);
 			var donation = new Donation
 			{
-				Quantity = viewModel.Quantity,
+				
+				Quantity = Math.Round(viewModel.Quantity, 2),
 				CreatedDate = viewModel.CreatedDate,
 				CreatedBy = currentUser,
 				Status = viewModel.Status,
@@ -222,7 +223,7 @@ namespace RedCross_System.Controllers
 			var viewModel = new DonationUpdateViewModel
 			{
 				Id = donation.Id,
-				Quantity = donation.Quantity,
+				Quantity = Math.Round(donation.Quantity, 2),
 				CreatedDate = donation.CreatedDate,
 
 				Status = donation.Status,

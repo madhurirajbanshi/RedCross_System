@@ -39,7 +39,7 @@
                   <td>@sn</td>
                   <td>@bloodrequirement.Name</td>
                   <td>@bloodrequirement.Purpose</td>
-                  <td>@bloodrequirement.Quantity</td>
+                  <td>@bloodrequirement.Quantity.ToString("F2")</td>
                   <td>
                     @if (!string.IsNullOrEmpty(@bloodrequirement.Document))
                     {
