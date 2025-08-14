@@ -126,7 +126,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-	options.UseMySql(builder.Configuration.GetConnectionString("MysqlConnection"),MySqlServerVersion.AutoDetect(builder.Configuration.GetConnectionString("MysqlConnection")));
+	options.UseSqlite(builder.Configuration.GetConnectionString("Data Source=redcross.db"));
 });
 
 builder.Services.AddAuthentication(options =>

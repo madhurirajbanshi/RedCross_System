@@ -43,18 +43,14 @@ public class ApplicationDbContext : DbContext
 	public DbSet<BloodRequirement> BloodRequirements { get; set; }
 	public DbSet<ProvinceOfficeEntity> ProvinceOfficeEntities { get; set; }
 
-
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
-	{
-		base.OnModelCreating(modelBuilder);
-		modelBuilder.Entity<ProvinceOfficeEntity>().ToTable("ProvinceOfficeEntities");
-
-		// Seeding Country
-		var country = new Country { Id = 1, Name = "Nepal" };
-		modelBuilder.Entity<Country>().HasData(country);
-
-		// Seeding Provinces
-		modelBuilder.Entity<Province>().HasData(
+	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+	=> optionsBuilder
+		.UseSqlite(@"Data Source=redcross.db")
+		.UseSeeding((context, _) =>
+		{
+			var country = new Country { Id = 1, Name = "Nepal" };
+			var provinces = new List<Province>
+			{
 				new Province { Id = 1, Name = "Koshi", CountryId = country.Id },
 				new Province { Id = 2, Name = "Madhesh", CountryId = country.Id },
 				new Province { Id = 3, Name = "Bagmati", CountryId = country.Id },
@@ -62,51 +58,110 @@ public class ApplicationDbContext : DbContext
 				new Province { Id = 5, Name = "Lumbini", CountryId = country.Id },
 				new Province { Id = 6, Name = "Karnali", CountryId = country.Id },
 				new Province { Id = 7, Name = "Sudurpashchim", CountryId = country.Id }
-		);
+			};
 
-		// Seeding Roles
-		modelBuilder.Entity<Role>().HasData(
+			var roles = new List<Role>
+			{
 				new Role { Id = 1, Name = "SuperAdmin" },
 				new Role { Id = 2, Name = "ProvinceUser" },
 				new Role { Id = 3, Name = "DistrictUser" },
 				new Role { Id = 4, Name = "BranchUser" },
-				new Role { Id=5,Name="NormalUser"}
-		);
+				new Role { Id = 5, Name = "NormalUser" }
+			};
 
-		modelBuilder.Entity<BloodType>().HasData(
-			new BloodType { Id = 1, Name = "A+" },
-			new BloodType { Id = 2, Name = "A-" },
-			new BloodType { Id = 3, Name = "B+" },
-			new BloodType { Id = 4, Name = "B-" },
-			new BloodType { Id = 5, Name = "AB+" },
-			new BloodType { Id = 6, Name = "AB-" },
-			new BloodType { Id = 7, Name = "O+" },
-			new BloodType { Id = 8, Name = "O-" }
-	);
+			var bloodTypes = new List<BloodType>
+			{
+				new BloodType { Id = 1, Name = "A+" },
+				new BloodType { Id = 2, Name = "A-" },
+				new BloodType { Id = 3, Name = "B+" },
+				new BloodType { Id = 4, Name = "B-" },
+				new BloodType { Id = 5, Name = "AB+" },
+				new BloodType { Id = 6, Name = "AB-" },
+				new BloodType { Id = 7, Name = "O+" },
+				new BloodType { Id = 8, Name = "O-" }
+			};
 
-		var superAdminRole = new Role { Id = 1, Name = "SuperAdmin" };
 
-		modelBuilder.Entity<User>().HasData(
-				new User
-				{
-					Id = 1,
-					Name = "Madhuri",
-					Email = "admin@gmail.com",
-					Phone = "98150999900",
-					RoleId = superAdminRole.Id,
-					Password = "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q" ,
-					BloodTypeId = 1,
-					
+			var user = new User
+			{
+				Id = 1,
+				Name = "Madhuri",
+				Email = "admin@gmail.com",
+				Phone = "98150999900",
+				RoleId = 1,
+				Password = "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q",
+				BloodTypeId = 1,
+			};
 
-				}
-		);
+			if (context.Set<User>().Any())
+			{
+				return;
+			}
+			context.Set<Country>().Add(country);
+			context.Set<Province>().AddRange(provinces);
+			context.Set<Role>().AddRange(roles);
+			context.Set<BloodType>().AddRange(bloodTypes);
+			context.Set<User>().Add(user);
+			context.SaveChanges();
 
-	
-	
+		})
+		.UseAsyncSeeding(async (context, _, cancellationToken) =>
+		{
+			var country = new Country { Id = 1, Name = "Nepal" };
+			var provinces = new List<Province>
+			{
+				new Province { Id = 1, Name = "Koshi", CountryId = country.Id },
+				new Province { Id = 2, Name = "Madhesh", CountryId = country.Id },
+				new Province { Id = 3, Name = "Bagmati", CountryId = country.Id },
+				new Province { Id = 4, Name = "Gandaki", CountryId = country.Id },
+				new Province { Id = 5, Name = "Lumbini", CountryId = country.Id },
+				new Province { Id = 6, Name = "Karnali", CountryId = country.Id },
+				new Province { Id = 7, Name = "Sudurpashchim", CountryId = country.Id }
+			};
 
-		modelBuilder.Entity<User>()
-				.HasIndex(u => u.Email)
-				.IsUnique();
-	}
+			var roles = new List<Role>
+			{
+				new Role { Id = 1, Name = "SuperAdmin" },
+				new Role { Id = 2, Name = "ProvinceUser" },
+				new Role { Id = 3, Name = "DistrictUser" },
+				new Role { Id = 4, Name = "BranchUser" },
+				new Role { Id = 5, Name = "NormalUser" }
+			};
+
+			var bloodTypes = new List<BloodType>
+			{
+				new BloodType { Id = 1, Name = "A+" },
+				new BloodType { Id = 2, Name = "A-" },
+				new BloodType { Id = 3, Name = "B+" },
+				new BloodType { Id = 4, Name = "B-" },
+				new BloodType { Id = 5, Name = "AB+" },
+				new BloodType { Id = 6, Name = "AB-" },
+				new BloodType { Id = 7, Name = "O+" },
+				new BloodType { Id = 8, Name = "O-" }
+			};
+
+			var user = new User
+			{
+				Id = 1,
+				Name = "Madhuri",
+				Email = "admin@gmail.com",
+				Phone = "98150999900",
+				RoleId = 1,
+				Password = "$2a$12$RtLWqAxupkrPWLRUKn2gquzX1BwAYCPNZz.7lO/fBtCVRp.2h852q",
+				BloodTypeId = 1,
+			};
+
+			if (await context.Set<User>().AnyAsync(cancellationToken: cancellationToken))
+			{
+				return;
+			}
+
+			await context.Set<Country>().AddAsync(country, cancellationToken: cancellationToken);
+			await context.Set<Province>().AddRangeAsync(provinces, cancellationToken: cancellationToken);
+			await context.Set<Role>().AddRangeAsync(roles, cancellationToken: cancellationToken);
+			await context.Set<BloodType>().AddRangeAsync(bloodTypes, cancellationToken: cancellationToken);
+			await context.Set<User>().AddAsync(user, cancellationToken: cancellationToken);
+			await context.SaveChangesAsync(cancellationToken);
+		});
 
 }
